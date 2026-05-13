@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#2563eb', '#16a34a', '#dc2626', '#ca8a04', '#9333ea']
+const COLORS = ['#0891b2', '#059669', '#e11d48', '#d97706', '#7c3aed']
 
 interface ChartThroughputProps {
   results: EndpointResult[]
@@ -42,9 +42,9 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
         <CardTitle>并发退化曲线</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div>
-            <p className="text-sm text-muted-foreground mb-2">TPS vs 并发数</p>
+            <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">TPS vs 并发数</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -67,7 +67,7 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
             </ResponsiveContainer>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground mb-2">TTFT vs 并发数 (ms)</p>
+            <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">TTFT vs 并发数 (ms)</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />

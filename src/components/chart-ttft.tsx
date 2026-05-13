@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -13,7 +14,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#2563eb', '#16a34a', '#dc2626', '#ca8a04', '#9333ea']
+const COLORS = ['#0891b2', '#059669', '#e11d48', '#d97706', '#7c3aed']
 
 interface ChartTTFTProps {
   results: EndpointResult[]
@@ -40,7 +41,10 @@ export function ChartTTFT({ results }: ChartTTFTProps) {
             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
-            <Bar dataKey="median" name="P50">
+            <Bar dataKey="median" name="P50" radius={[6, 6, 0, 0]}>
+              {data.map(entry => (
+                <Cell key={entry.name} fill={entry.fill} />
+              ))}
               <ErrorBar dataKey="errorMargin" width={4} strokeWidth={1.5} />
             </Bar>
           </BarChart>

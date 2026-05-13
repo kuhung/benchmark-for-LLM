@@ -101,8 +101,8 @@ function ModelIdSelector({
         </Button>
       </div>
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-popover shadow-lg">
-          <div className="flex items-center gap-1 border-b border-border px-2 py-1.5">
+        <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-xl shadow-black/10">
+          <div className="flex items-center gap-2 border-b border-border px-3 py-2">
             <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             <input
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
@@ -193,15 +193,15 @@ export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {endpoints.map(ep => (
-          <div key={ep.id} className="rounded-lg border border-border bg-background p-4 space-y-4">
-            <div className="flex items-center gap-2 border-b border-border pb-3">
+          <div key={ep.id} className="space-y-4 rounded-lg border border-border bg-muted/40 p-4">
+            <div className="flex flex-col gap-3 border-b border-border pb-3 sm:flex-row sm:items-center">
               <div className="flex gap-1 flex-wrap">
                 {PRESETS.map(preset => (
                   <Button
                     key={preset.label}
                     variant="ghost"
                     size="sm"
-                    className="text-xs h-7 px-2"
+                    className="h-7 px-2 text-xs"
                     onClick={() => applyPreset(ep.id, preset)}
                   >
                     {preset.label}
@@ -209,21 +209,21 @@ export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
                 ))}
               </div>
               <div className="flex-1" />
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => removeEndpoint(ep.id)} title="删除端点">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeEndpoint(ep.id)} title="删除端点">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">显示名称</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">显示名称</label>
                 <Input value={ep.name} onChange={e => updateEndpoint(ep.id, { name: e.target.value })} placeholder="My Model" />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Base URL</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Base URL</label>
                 <Input value={ep.baseUrl} onChange={e => updateEndpoint(ep.id, { baseUrl: e.target.value })} placeholder="http://localhost:11434" />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Model ID</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Model ID</label>
                 <ModelIdSelector
                   value={ep.modelId}
                   baseUrl={ep.baseUrl}
@@ -232,12 +232,12 @@ export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">API Key (可选)</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">API Key (可选)</label>
                 <Input type="password" value={ep.apiKey || ''} onChange={e => updateEndpoint(ep.id, { apiKey: e.target.value || undefined })} placeholder="sk-..." />
               </div>
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs text-muted-foreground">使用 `/v1/models` 检查 CORS、鉴权和服务可达性。</p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs leading-5 text-muted-foreground">使用 `/v1/models` 检查 CORS、鉴权和服务可达性。</p>
               <Button variant="outline" size="sm" onClick={() => testConnection(ep)} disabled={connectStatus[ep.id] === 'checking'} className="shrink-0">
               {connectStatus[ep.id] === 'checking' && <Loader2 className="h-3 w-3 animate-spin" />}
               {connectStatus[ep.id] === 'ok' && <Wifi className="h-3 w-3 text-green-500" />}

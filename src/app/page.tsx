@@ -10,7 +10,7 @@ import { RunProgress } from '@/components/run-progress'
 import { ResultDashboard } from '@/components/result-dashboard'
 import { HistoryList } from '@/components/history-list'
 import { Button } from '@/components/ui/button'
-import { Activity, Database, Gauge, Play, ShieldCheck } from 'lucide-react'
+import { Activity, Database, Gauge, Play, ShieldCheck, Zap } from 'lucide-react'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'new' | 'history'>('new')
@@ -51,26 +51,26 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <header className="border-b border-border bg-card/85 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 border-b border-border/80 bg-card/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
               <Gauge className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-base font-bold leading-tight">LLM Inference Benchmark</h1>
-              <p className="text-xs text-muted-foreground">浏览器内完成 LLM 延迟、吞吐和稳定性测评</p>
+              <h1 className="text-sm font-bold leading-tight sm:text-base">LLM Inference Benchmark</h1>
+              <p className="hidden text-xs text-muted-foreground sm:block">浏览器内完成延迟、吞吐和稳定性测评</p>
             </div>
           </div>
-          <div className="flex shrink-0 gap-1 rounded-md border border-border bg-muted p-1">
+          <div className="flex shrink-0 gap-1 rounded-full border border-border bg-muted p-1">
             <button
-              className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${activeTab === 'new' ? 'bg-card shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === 'new' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               onClick={() => setActiveTab('new')}
             >
               新建测评
             </button>
             <button
-              className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${activeTab === 'history' ? 'bg-card shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === 'history' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               onClick={() => setActiveTab('history')}
             >
               历史记录
@@ -79,18 +79,18 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <div className="mx-auto max-w-7xl space-y-5 px-4 py-5 sm:py-7">
         {activeTab === 'new' && (
           <>
             {!session && (
               <>
-                <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-                  <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
-                    <div className="mb-5 flex items-start justify-between gap-4">
+                <section className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+                  <div className="rounded-lg border border-border/80 bg-card p-5 shadow-sm shadow-black/5">
+                    <div className="mb-5 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                       <div>
-                        <p className="text-xs font-semibold uppercase text-primary">Speed lab</p>
-                        <h2 className="mt-2 text-2xl font-bold">测你的模型服务真实体感</h2>
-                        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                        <p className="text-xs font-bold uppercase text-muted-foreground">Speed lab</p>
+                        <h2 className="mt-2 text-2xl font-bold tracking-normal text-foreground sm:text-3xl">测你的模型服务真实体感</h2>
+                        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
                           配置 OpenAI-compatible endpoint，直接采集 TTFT、TPS、ITL 和并发退化曲线。
                         </p>
                       </div>
@@ -103,21 +103,26 @@ export default function Home() {
                         <Play className="h-4 w-4" /> 开始测评
                       </Button>
                     </div>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      <div className="rounded-md border border-border bg-background p-3">
-                        <Activity className="mb-2 h-4 w-4 text-primary" />
-                        <p className="text-sm font-semibold">流式采样</p>
-                        <p className="text-xs text-muted-foreground">逐 token 记录到达时间</p>
+                    <div className="grid gap-3 md:grid-cols-4">
+                      <div className="rounded-lg border border-border bg-muted/40 p-4">
+                        <Activity className="mb-3 h-4 w-4 text-cyan-600" />
+                        <p className="text-sm font-bold">流式采样</p>
+                        <p className="mt-1 text-xs text-muted-foreground">逐 token 记录到达时间</p>
                       </div>
-                      <div className="rounded-md border border-border bg-background p-3">
-                        <ShieldCheck className="mb-2 h-4 w-4 text-amber-600" />
-                        <p className="text-sm font-semibold">本地隐私</p>
-                        <p className="text-xs text-muted-foreground">API Key 不离开浏览器</p>
+                      <div className="rounded-lg border border-border bg-muted/40 p-4">
+                        <ShieldCheck className="mb-3 h-4 w-4 text-emerald-600" />
+                        <p className="text-sm font-bold">本地隐私</p>
+                        <p className="mt-1 text-xs text-muted-foreground">API Key 不离开浏览器</p>
                       </div>
-                      <div className="rounded-md border border-border bg-background p-3">
-                        <Database className="mb-2 h-4 w-4 text-rose-700" />
-                        <p className="text-sm font-semibold">可导入导出</p>
-                        <p className="text-xs text-muted-foreground">Web 与 CLI 结果兼容</p>
+                      <div className="rounded-lg border border-border bg-muted/40 p-4">
+                        <Database className="mb-3 h-4 w-4 text-rose-600" />
+                        <p className="text-sm font-bold">可导入导出</p>
+                        <p className="mt-1 text-xs text-muted-foreground">Web 与 CLI 结果兼容</p>
+                      </div>
+                      <div className="rounded-lg border border-primary bg-primary p-4 text-white">
+                        <Zap className="mb-3 h-4 w-4 text-sky-300" />
+                        <p className="text-sm font-bold">{config.concurrencyLevels.length} 组并发</p>
+                        <p className="mt-1 text-xs text-primary-foreground/70">{config.repeatCount} 次重复，最多 {config.maxTokens} tokens</p>
                       </div>
                     </div>
                   </div>

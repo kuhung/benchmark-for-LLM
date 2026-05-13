@@ -18,10 +18,10 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
       <CardHeader>
         <CardTitle>测评参数</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         <div>
-          <label className="text-sm font-medium mb-2 block">测试 Prompt</label>
-          <div className="flex gap-2 mb-2 flex-wrap">
+          <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">测试 Prompt</label>
+          <div className="mb-3 flex flex-wrap gap-2">
             {PROMPT_PRESETS.map(preset => (
               <Button
                 key={preset.id}
@@ -34,7 +34,7 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
             ))}
           </div>
           <textarea
-            className={`${compact ? 'h-28' : 'h-24'} w-full rounded-md border border-border bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50`}
+            className={`${compact ? 'h-32' : 'h-24'} w-full resize-none rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm leading-6 shadow-inner shadow-black/5 transition-all placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/10`}
             value={config.prompt}
             onChange={e => onChange({ ...config, prompt: e.target.value })}
             placeholder="输入自定义 Prompt..."
@@ -42,7 +42,7 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
         </div>
         <div className={`grid grid-cols-1 ${compact ? 'gap-3' : 'md:grid-cols-3 gap-4'}`}>
           <div>
-            <label className="text-sm font-medium mb-1 block">最大输出 Tokens</label>
+            <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">最大输出 Tokens</label>
             <Input
               type="number"
               value={config.maxTokens}
@@ -52,7 +52,7 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
             />
           </div>
           <div>
-            <label className="text-sm font-medium mb-1 block">重复次数</label>
+            <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">重复次数</label>
             <Input
               type="number"
               value={config.repeatCount}
@@ -62,13 +62,14 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
             />
           </div>
           <div>
-            <label className="text-sm font-medium mb-1 block">并发级别</label>
-            <div className="flex gap-1 pt-1">
+            <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">并发级别</label>
+            <div className="flex gap-1 rounded-full border border-border bg-muted p-1">
               {[1, 2, 4, 8].map(level => (
                 <Button
                   key={level}
                   variant={config.concurrencyLevels.includes(level) ? 'default' : 'outline'}
                   size="sm"
+                  className="h-8 flex-1 px-2"
                   onClick={() => {
                     const levels = config.concurrencyLevels.includes(level)
                       ? config.concurrencyLevels.filter(l => l !== level)

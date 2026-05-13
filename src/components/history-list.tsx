@@ -83,9 +83,9 @@ export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
         ) : (
           <div className="space-y-2">
             {sessions.map(session => (
-              <div key={session.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div key={session.id} className="flex flex-col gap-3 rounded-lg border border-border bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-semibold text-foreground">
                     {new Date(session.timestamp).toLocaleString('zh-CN')}
                   </p>
                   <p className="text-xs text-muted-foreground">

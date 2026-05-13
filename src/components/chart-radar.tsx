@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#2563eb', '#16a34a', '#dc2626', '#ca8a04', '#9333ea']
+const COLORS = ['#0891b2', '#059669', '#e11d48', '#d97706', '#7c3aed']
 const DIMENSIONS = [
   { key: 'speed', label: 'Speed' },
   { key: 'responsiveness', label: 'Responsiveness' },

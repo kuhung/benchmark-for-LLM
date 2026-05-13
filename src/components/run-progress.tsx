@@ -19,7 +19,7 @@ export function RunProgress({ progress, onCancel }: RunProgressProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="w-full max-w-md mx-4 rounded-xl border border-border bg-card p-6 shadow-lg space-y-4">
+      <div className="mx-4 w-full max-w-md space-y-4 rounded-lg border border-border bg-card p-6 shadow-xl shadow-black/10">
         <div className="flex items-center gap-3">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
           <h3 className="font-semibold">测评进行中</h3>
@@ -43,13 +43,13 @@ export function RunProgress({ progress, onCancel }: RunProgressProps) {
           {progress.liveMetrics && (
             <div className="grid grid-cols-2 gap-2 pt-2">
               {typeof progress.liveMetrics.ttft === 'number' && (
-                <div className="rounded-md border border-border bg-background px-3 py-2">
+                <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
                   <p className="text-xs">最新 TTFT</p>
                   <p className="text-foreground font-semibold">{progress.liveMetrics.ttft.toFixed(0)} ms</p>
                 </div>
               )}
               {typeof progress.liveMetrics.tps === 'number' && (
-                <div className="rounded-md border border-border bg-background px-3 py-2">
+                <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
                   <p className="text-xs">最新 TPS</p>
                   <p className="text-foreground font-semibold">{progress.liveMetrics.tps.toFixed(1)}</p>
                 </div>

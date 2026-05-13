@@ -36,9 +36,9 @@ export function ChartITL({ results }: ChartITLProps) {
             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
-            <Bar dataKey="p50" name="P50" fill="#0f766e" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="p95" name="P95" fill="#d97706" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="p99" name="P99" fill="#be123c" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="p50" name="P50" fill="#0891b2" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="p95" name="P95" fill="#d97706" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="p99" name="P99" fill="#e11d48" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
