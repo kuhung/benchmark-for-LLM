@@ -14,6 +14,7 @@ interface HistoryListProps {
 
 export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
   const [sessions, setSessions] = useState<BenchmarkSession[]>([])
+  const [importError, setImportError] = useState<string | null>(null)
 
   useEffect(() => {
     loadSessions()
@@ -50,9 +51,10 @@ export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
       const text = await file.text()
       try {
         await importSession(text)
+        setImportError(null)
         await loadSessions()
       } catch (err) {
-        console.error('Import failed:', err)
+        setImportError(err instanceof Error ? err.message : '导入失败，请检查 JSON 格式')
       }
     }
     input.click()
@@ -69,6 +71,11 @@ export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {importError && (
+          <div className="mb-3 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {importError}
+          </div>
+        )}
         {sessions.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">
             暂无历史记录。完成一次测评后保存即可在此查看。

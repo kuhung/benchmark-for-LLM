@@ -8,7 +8,7 @@ import {
   BenchmarkSession,
 } from './types'
 import { runSingleBenchmark } from './runner'
-import { aggregateMetrics } from './metrics'
+import { aggregateMetrics, computeSingleMetrics } from './metrics'
 import { computeRadarScore } from './scoring'
 
 export class BenchmarkOrchestrator {
@@ -72,12 +72,8 @@ export class BenchmarkOrchestrator {
       const roundResults = await this.runConcurrencyLevel(endpoint, config, concurrency)
       allRawResults.push(...roundResults)
 
-      const wallClockStart = Math.min(...roundResults.map(r => r.requestStart))
-      const wallClockEnd = Math.max(
-        ...roundResults
-          .filter(r => r.tokenTimestamps.length > 0)
-          .map(r => r.tokenTimestamps[r.tokenTimestamps.length - 1])
-      )
+      const wallClockStart = roundResults.length > 0 ? Math.min(...roundResults.map(r => r.requestStart)) : 0
+      const wallClockEnd = roundResults.length > 0 ? Math.max(...roundResults.map(r => r.requestEnd ?? r.requestStart)) : 0
       const wallClockTime = (wallClockEnd - wallClockStart) / 1000
 
       const totalTokens = roundResults.reduce((sum, r) => sum + r.outputTokenCount, 0)
@@ -127,17 +123,22 @@ export class BenchmarkOrchestrator {
           config.prompt,
           config.maxTokens,
           this.abortController!.signal,
-          (ts) => {
-            this.progress.liveMetrics = {
-              ttft: this.progress.liveMetrics?.ttft,
-              tps: this.progress.liveMetrics?.tps,
-            }
-          }
+          () => undefined
         )
       )
 
       const batchResults = await Promise.all(promises)
       results.push(...batchResults)
+      const latestMetrics = batchResults
+        .map(result => computeSingleMetrics(result))
+        .find((metric): metric is NonNullable<typeof metric> => metric !== null)
+      if (latestMetrics) {
+        this.progress.liveMetrics = {
+          ttft: latestMetrics.ttft,
+          tps: latestMetrics.tps,
+          e2eLatency: latestMetrics.e2eLatency,
+        }
+      }
       this.progress.completedTasks += batchSize
       this.emitProgress()
     }

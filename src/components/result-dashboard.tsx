@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { ChartRadar } from '@/components/chart-radar'
 import { ChartTTFT } from '@/components/chart-ttft'
 import { ChartTPS } from '@/components/chart-tps'
+import { ChartITL } from '@/components/chart-itl'
 import { ChartThroughput } from '@/components/chart-throughput'
 import { Download, Save } from 'lucide-react'
 import { saveSession, exportSession } from '@/lib/store'
@@ -34,9 +35,14 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">测评结果</h2>
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-xl font-bold">测评结果</h2>
+          <p className="text-sm text-muted-foreground">
+            {session.results.length} 个端点，{session.config.repeatCount} 次重复，并发 {session.config.concurrencyLevels.join('/')}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={handleSave}>
             <Save className="h-4 w-4" /> 保存到历史
           </Button>
@@ -55,6 +61,7 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
         <ChartTPS results={session.results} />
       </div>
 
+      <ChartITL results={session.results} />
       <ChartThroughput results={session.results} />
 
       <Card>

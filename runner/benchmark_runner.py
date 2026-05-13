@@ -11,7 +11,7 @@ import json
 import math
 import time
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import httpx
@@ -35,6 +35,7 @@ class Endpoint:
 class RawResult:
     endpoint_id: str
     request_start: float
+    request_end: float = 0.0
     token_timestamps: list[float] = field(default_factory=list)
     output_token_count: int = 0
     status: str = "success"
@@ -50,6 +51,18 @@ class StatsSummary:
     min: float = 0.0
     max: float = 0.0
     std_dev: float = 0.0
+
+
+def stats_to_web_dict(stats: StatsSummary) -> dict:
+    return {
+        "mean": stats.mean,
+        "median": stats.median,
+        "p95": stats.p95,
+        "p99": stats.p99,
+        "min": stats.min,
+        "max": stats.max,
+        "stdDev": stats.std_dev,
+    }
 
 
 def percentile(sorted_values: list[float], p: float) -> float:
@@ -112,6 +125,7 @@ async def run_single_benchmark(
                 return RawResult(
                     endpoint_id=endpoint.id,
                     request_start=request_start,
+                    request_end=time.perf_counter(),
                     status="error",
                     error=f"HTTP {response.status_code}",
                 )
@@ -132,6 +146,7 @@ async def run_single_benchmark(
         return RawResult(
             endpoint_id=endpoint.id,
             request_start=request_start,
+            request_end=time.perf_counter(),
             token_timestamps=token_timestamps,
             output_token_count=len(token_timestamps),
             status="error",
@@ -141,6 +156,7 @@ async def run_single_benchmark(
     return RawResult(
         endpoint_id=endpoint.id,
         request_start=request_start,
+        request_end=time.perf_counter(),
         token_timestamps=token_timestamps,
         output_token_count=len(token_timestamps),
         status="success",
@@ -148,19 +164,19 @@ async def run_single_benchmark(
 
 
 def compute_single_metrics(raw: RawResult) -> dict | None:
-    if raw.status != "success" or len(raw.token_timestamps) < 2:
+    if raw.status != "success" or len(raw.token_timestamps) == 0:
         return None
     ttft = (raw.token_timestamps[0] - raw.request_start) * 1000
     first_token = raw.token_timestamps[0]
-    last_token = raw.token_timestamps[-1]
-    duration = last_token - first_token
+    request_end = raw.request_end or raw.token_timestamps[-1]
+    duration = request_end - first_token
     tps = raw.output_token_count / duration if duration > 0 else 0
 
     itl = [
         (raw.token_timestamps[i + 1] - raw.token_timestamps[i]) * 1000
         for i in range(len(raw.token_timestamps) - 1)
     ]
-    e2e = (last_token - raw.request_start) * 1000
+    e2e = (request_end - raw.request_start) * 1000
     return {"ttft": ttft, "tps": tps, "itl": itl, "e2eLatency": e2e}
 
 
@@ -169,7 +185,7 @@ def aggregate_results(raw_results: list[RawResult]) -> dict:
     metrics_list = [m for r in successful if (m := compute_single_metrics(r)) is not None]
 
     if not metrics_list:
-        empty = asdict(StatsSummary())
+        empty = stats_to_web_dict(StatsSummary())
         return {
             "ttft": empty, "tps": empty, "itl": empty, "e2eLatency": empty,
             "successRate": 0, "totalRequests": len(raw_results),
@@ -177,10 +193,10 @@ def aggregate_results(raw_results: list[RawResult]) -> dict:
 
     all_itl = [v for m in metrics_list for v in m["itl"]]
     return {
-        "ttft": asdict(compute_stats([m["ttft"] for m in metrics_list])),
-        "tps": asdict(compute_stats([m["tps"] for m in metrics_list])),
-        "itl": asdict(compute_stats(all_itl)),
-        "e2eLatency": asdict(compute_stats([m["e2eLatency"] for m in metrics_list])),
+        "ttft": stats_to_web_dict(compute_stats([m["ttft"] for m in metrics_list])),
+        "tps": stats_to_web_dict(compute_stats([m["tps"] for m in metrics_list])),
+        "itl": stats_to_web_dict(compute_stats(all_itl)),
+        "e2eLatency": stats_to_web_dict(compute_stats([m["e2eLatency"] for m in metrics_list])),
         "successRate": (len(successful) / len(raw_results)) * 100,
         "totalRequests": len(raw_results),
     }
@@ -205,7 +221,7 @@ def compute_score(single_metrics: dict, concurrency_results: list[dict]) -> dict
             ratio = c_last["metrics"]["tps"]["median"] / c1["metrics"]["tps"]["median"]
             scalability = linear(ratio, 0.3, 1.0)
 
-    cv = (single_metrics["ttft"]["std_dev"] / single_metrics["ttft"]["mean"]
+    cv = (single_metrics["ttft"]["stdDev"] / single_metrics["ttft"]["mean"]
           if single_metrics["ttft"]["mean"] > 0 else 0)
     stability = inverse_linear(cv, 0.05, 0.8)
 
@@ -277,6 +293,7 @@ async def benchmark_endpoint(
         raw_dicts.append({
             "endpointId": r.endpoint_id,
             "requestStart": r.request_start,
+            "requestEnd": r.request_end or (r.token_timestamps[-1] if r.token_timestamps else r.request_start),
             "tokenTimestamps": r.token_timestamps,
             "outputTokenCount": r.output_token_count,
             "status": r.status,

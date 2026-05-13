@@ -43,9 +43,11 @@ export async function runSingleBenchmark(
     clearTimeout(timeoutId)
 
     if (!response.ok) {
+      const requestEnd = performance.now()
       return {
         endpointId: endpoint.id,
         requestStart,
+        requestEnd,
         tokenTimestamps: [],
         outputTokenCount: 0,
         status: 'error',
@@ -63,15 +65,18 @@ export async function runSingleBenchmark(
     return {
       endpointId: endpoint.id,
       requestStart,
+      requestEnd: performance.now(),
       tokenTimestamps,
       outputTokenCount: tokenTimestamps.length,
       status: 'success',
     }
   } catch (err) {
     const isTimeout = err instanceof DOMException && err.name === 'AbortError'
+    const requestEnd = performance.now()
     return {
       endpointId: endpoint.id,
       requestStart,
+      requestEnd,
       tokenTimestamps,
       outputTokenCount: tokenTimestamps.length,
       status: isTimeout ? 'timeout' : 'error',
@@ -95,5 +100,34 @@ export async function checkConnectivity(endpoint: Endpoint): Promise<{ ok: boole
     return { ok: false, error: `HTTP ${response.status}` }
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : 'Unknown error' }
+  }
+}
+
+export async function fetchModels(
+  baseUrl: string,
+  apiKey?: string
+): Promise<{ ok: boolean; models: string[]; error?: string }> {
+  try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
+
+    const response = await fetch(`${baseUrl}/v1/models`, {
+      method: 'GET',
+      headers,
+      signal: AbortSignal.timeout(10_000),
+    })
+
+    if (!response.ok) {
+      return { ok: false, models: [], error: `HTTP ${response.status}` }
+    }
+
+    const data = await response.json()
+    const models: string[] = (data.data ?? [])
+      .map((m: { id?: string }) => m.id)
+      .filter((id: unknown): id is string => typeof id === 'string' && id.length > 0)
+
+    return { ok: true, models }
+  } catch (err) {
+    return { ok: false, models: [], error: err instanceof Error ? err.message : 'Unknown error' }
   }
 }

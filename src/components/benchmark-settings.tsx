@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button'
 interface BenchmarkSettingsProps {
   config: BenchmarkConfig
   onChange: (config: BenchmarkConfig) => void
+  compact?: boolean
 }
 
-export function BenchmarkSettings({ config, onChange }: BenchmarkSettingsProps) {
+export function BenchmarkSettings({ config, onChange, compact = false }: BenchmarkSettingsProps) {
   return (
-    <Card>
+    <Card className={compact ? 'h-full' : undefined}>
       <CardHeader>
         <CardTitle>测评参数</CardTitle>
       </CardHeader>
@@ -33,13 +34,13 @@ export function BenchmarkSettings({ config, onChange }: BenchmarkSettingsProps) 
             ))}
           </div>
           <textarea
-            className="w-full h-24 rounded-md border border-border bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className={`${compact ? 'h-28' : 'h-24'} w-full rounded-md border border-border bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50`}
             value={config.prompt}
             onChange={e => onChange({ ...config, prompt: e.target.value })}
             placeholder="输入自定义 Prompt..."
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={`grid grid-cols-1 ${compact ? 'gap-3' : 'md:grid-cols-3 gap-4'}`}>
           <div>
             <label className="text-sm font-medium mb-1 block">最大输出 Tokens</label>
             <Input

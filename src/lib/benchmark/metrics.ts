@@ -1,19 +1,20 @@
 import { RawResult, SingleMetrics, AggregatedMetrics, StatsSummary } from './types'
 
 export function computeSingleMetrics(raw: RawResult): SingleMetrics | null {
-  if (raw.status !== 'success' || raw.tokenTimestamps.length < 2) return null
+  if (raw.status !== 'success' || raw.tokenTimestamps.length === 0) return null
 
   const ttft = raw.tokenTimestamps[0] - raw.requestStart
-  const lastToken = raw.tokenTimestamps[raw.tokenTimestamps.length - 1]
   const firstToken = raw.tokenTimestamps[0]
-  const tps = raw.outputTokenCount / ((lastToken - firstToken) / 1000)
+  const requestEnd = raw.requestEnd ?? raw.tokenTimestamps[raw.tokenTimestamps.length - 1]
+  const decodeDurationSeconds = Math.max((requestEnd - firstToken) / 1000, 0)
+  const tps = decodeDurationSeconds > 0 ? raw.outputTokenCount / decodeDurationSeconds : 0
 
   const itl: number[] = []
   for (let i = 1; i < raw.tokenTimestamps.length; i++) {
     itl.push(raw.tokenTimestamps[i] - raw.tokenTimestamps[i - 1])
   }
 
-  const e2eLatency = lastToken - raw.requestStart
+  const e2eLatency = requestEnd - raw.requestStart
 
   return { ttft, tps, itl, e2eLatency }
 }

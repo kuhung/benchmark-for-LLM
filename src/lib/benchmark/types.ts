@@ -9,6 +9,7 @@ export interface Endpoint {
 export interface RawResult {
   endpointId: string
   requestStart: number
+  requestEnd: number
   tokenTimestamps: number[]
   outputTokenCount: number
   status: 'success' | 'error' | 'timeout'

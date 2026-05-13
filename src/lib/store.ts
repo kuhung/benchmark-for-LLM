@@ -1,5 +1,5 @@
 import { openDB, IDBPDatabase } from 'idb'
-import { BenchmarkSession } from './benchmark/types'
+import { BenchmarkSession, StatsSummary } from './benchmark/types'
 
 const DB_NAME = 'llm-benchmark'
 const DB_VERSION = 1
@@ -41,7 +41,57 @@ export async function exportSession(session: BenchmarkSession): Promise<string> 
 }
 
 export async function importSession(json: string): Promise<BenchmarkSession> {
-  const session = JSON.parse(json) as BenchmarkSession
+  const session = normalizeImportedSession(JSON.parse(json))
   await saveSession(session)
   return session
+}
+
+function normalizeImportedSession(value: unknown): BenchmarkSession {
+  if (!isRecord(value)) {
+    throw new Error('JSON 不是有效的 BenchmarkSession')
+  }
+
+  const session = value as unknown as BenchmarkSession
+  if (!session.id || !session.timestamp || !session.config || !Array.isArray(session.results)) {
+    throw new Error('JSON 缺少必要的测评会话字段')
+  }
+
+  return {
+    ...session,
+    results: session.results.map(result => ({
+      ...result,
+      singleConcurrency: normalizeAggregatedMetrics(result.singleConcurrency),
+      concurrencyResults: result.concurrencyResults.map(concurrencyResult => ({
+        ...concurrencyResult,
+        metrics: normalizeAggregatedMetrics(concurrencyResult.metrics),
+      })),
+      rawResults: result.rawResults.map(raw => ({
+        ...raw,
+        requestEnd: raw.requestEnd ?? raw.tokenTimestamps.at(-1) ?? raw.requestStart,
+      })),
+    })),
+  }
+}
+
+function normalizeAggregatedMetrics<T extends { ttft: StatsSummary; tps: StatsSummary; itl: StatsSummary; e2eLatency: StatsSummary }>(
+  metrics: T
+): T {
+  return {
+    ...metrics,
+    ttft: normalizeStats(metrics.ttft),
+    tps: normalizeStats(metrics.tps),
+    itl: normalizeStats(metrics.itl),
+    e2eLatency: normalizeStats(metrics.e2eLatency),
+  }
+}
+
+function normalizeStats(stats: StatsSummary & { std_dev?: number }): StatsSummary {
+  return {
+    ...stats,
+    stdDev: stats.stdDev ?? stats.std_dev ?? 0,
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }

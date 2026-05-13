@@ -40,6 +40,22 @@ export function RunProgress({ progress, onCancel }: RunProgressProps) {
           {progress.currentConcurrency && (
             <p>并发: {progress.currentConcurrency}x</p>
           )}
+          {progress.liveMetrics && (
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              {typeof progress.liveMetrics.ttft === 'number' && (
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs">最新 TTFT</p>
+                  <p className="text-foreground font-semibold">{progress.liveMetrics.ttft.toFixed(0)} ms</p>
+                </div>
+              )}
+              {typeof progress.liveMetrics.tps === 'number' && (
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs">最新 TPS</p>
+                  <p className="text-foreground font-semibold">{progress.liveMetrics.tps.toFixed(1)}</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <Button variant="destructive" size="sm" onClick={onCancel} className="w-full">

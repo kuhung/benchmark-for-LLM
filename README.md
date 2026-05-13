@@ -221,6 +221,23 @@ graph TB
 - 原始数据表格
 - 操作：导出 JSON / 保存到历史
 
+### 当前实现状态
+
+已实现：
+
+- Web 端端点配置、预设、连通性检测和模型发现（通过 `/v1/models`）
+- 浏览器内流式 Benchmark、重复测量、并发测量、取消测评
+- TTFT / TPS / ITL / E2E / 成功率统计，以及雷达图综合评分
+- TTFT、TPS、ITL 分布、并发退化曲线和原始摘要表
+- IndexedDB 历史保存、删除、查看、JSON 导入/导出
+- Python CLI Runner 输出 Web 端兼容 JSON
+
+仍未实现或需后续增强：
+
+- 延迟分位数阶梯图尚未单独实现，当前通过表格和 ITL/TTFT 图展示关键分位数
+- 原始逐请求明细表尚未展开，当前展示端点级摘要
+- 浏览器端仍依赖目标服务开启 CORS；无法开启时应使用 Python Runner
+
 ---
 
 ## 项目结构
@@ -230,7 +247,7 @@ benchmark-for-LLM/
 ├── src/
 │   ├── app/
 │   │   ├── page.tsx                    # 主页（唯一页面）
-│   │   ├── layout.tsx                  # Root Layout（含 Git 版本号）
+│   │   ├── layout.tsx                  # Root Layout（展示 Git 版本号）
 │   │   └── globals.css                 # 全局样式
 │   ├── lib/
 │   │   ├── benchmark/
@@ -241,8 +258,7 @@ benchmark-for-LLM/
 │   │   │   ├── scoring.ts              # 综合评分（五维雷达图，阈值可配）
 │   │   │   └── types.ts                # TypeScript 类型定义
 │   │   ├── prompts.ts                  # 内置测试 Prompt 集
-│   │   ├── store.ts                    # IndexedDB 存取封装
-│   │   └── git-version.ts              # Git 版本号（构建时注入）
+│   │   └── store.ts                    # IndexedDB 存取封装
 │   └── components/
 │       ├── ui/                          # shadcn/ui 基础组件
 │       ├── endpoint-config.tsx          # 端点配置卡片
@@ -254,8 +270,7 @@ benchmark-for-LLM/
 │       ├── chart-itl.tsx                # ITL 分布图
 │       ├── chart-throughput.tsx         # 并发吞吐曲线
 │       ├── chart-radar.tsx              # 雷达图
-│       ├── history-list.tsx             # 历史记录列表
-│       └── json-import-export.tsx       # JSON 导入/导出
+│       └── history-list.tsx             # 历史记录与 JSON 导入/导出
 ├── runner/
 │   ├── benchmark_runner.py             # Python CLI Runner 主入口
 │   ├── requirements.txt                # httpx, rich
@@ -264,7 +279,7 @@ benchmark-for-LLM/
 ├── package.json
 ├── tsconfig.json
 ├── next.config.ts
-├── tailwind.config.ts
+├── postcss.config.mjs
 └── README.md
 ```
 
