@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#ccff00', '#00f0ff', '#ff0055', '#ff9900', '#b000ff']
+const COLORS = ['#a3e635', '#38bdf8', '#f472b6', '#fb923c', '#a78bfa']
 const DIMENSIONS = [
   { key: 'speed', label: 'Speed' },
   { key: 'responsiveness', label: 'Response' },
@@ -41,16 +41,15 @@ export function ChartRadar({ results }: ChartRadarProps) {
       <CardHeader>
         <CardTitle>
           Overall Score
-          <span className="flex-1" />
           {results.map(r => r.score && (
-            <span key={r.endpoint.id} className="text-[10px] font-normal text-muted-foreground/50 font-mono tracking-wider">
-              [{r.endpoint.name}: {r.score.overall}]
+            <span key={r.endpoint.id} className="ml-3 text-xs font-normal text-muted-foreground font-mono">
+              {r.endpoint.name}: {r.score.overall}
             </span>
           ))}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 sm:p-6">
-        <ResponsiveContainer width="100%" height={320}>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
           <RadarChart data={data}>
             <PolarGrid stroke="var(--color-border)" gridType="polygon" />
             <PolarAngleAxis
@@ -70,13 +69,11 @@ export function ChartRadar({ results }: ChartRadarProps) {
                 dataKey={r.endpoint.name}
                 stroke={COLORS[i % COLORS.length]}
                 fill={COLORS[i % COLORS.length]}
-                fillOpacity={0.12}
+                fillOpacity={0.1}
                 strokeWidth={2}
               />
             ))}
-            <Legend
-              wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }}
-            />
+            <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }} />
           </RadarChart>
         </ResponsiveContainer>
       </CardContent>

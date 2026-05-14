@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#ccff00', '#00f0ff', '#ff0055', '#ff9900', '#b000ff']
+const COLORS = ['#a3e635', '#38bdf8', '#f472b6', '#fb923c', '#a78bfa']
 
 interface ChartThroughputProps {
   results: EndpointResult[]
@@ -38,25 +38,21 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
 
   const tooltipStyle = {
     backgroundColor: 'var(--color-card)',
-    border: '2px solid var(--color-border)',
-    borderRadius: 0,
+    border: '1px solid var(--color-border)',
+    borderRadius: '6px',
     fontFamily: 'var(--font-mono)',
     fontSize: '12px',
-    boxShadow: '4px 4px 0px 0px var(--color-primary)',
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Concurrency Degradation</CardTitle>
+        <CardTitle>Concurrency Scaling</CardTitle>
       </CardHeader>
-      <CardContent className="p-4 sm:p-6">
+      <CardContent>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="border-2 border-border/60 bg-background/40 p-4">
-            <p className="mb-4 text-[10px] font-bold uppercase text-muted-foreground/50 border-b-2 border-border/40 pb-2 tracking-wider flex items-center gap-2">
-              <span className="h-1.5 w-1.5 bg-emerald-400" />
-              TPS vs Concurrency
-            </p>
+          <div>
+            <p className="mb-3 text-xs text-muted-foreground">TPS vs Concurrency</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
@@ -88,11 +84,8 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="border-2 border-border/60 bg-background/40 p-4">
-            <p className="mb-4 text-[10px] font-bold uppercase text-muted-foreground/50 border-b-2 border-border/40 pb-2 tracking-wider flex items-center gap-2">
-              <span className="h-1.5 w-1.5 bg-[#00f0ff]" />
-              TTFT vs Concurrency (ms)
-            </p>
+          <div>
+            <p className="mb-3 text-xs text-muted-foreground">TTFT vs Concurrency (ms)</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />

@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#ccff00', '#00f0ff', '#ff0055', '#ff9900', '#b000ff']
+const COLORS = ['#a3e635', '#38bdf8', '#f472b6', '#fb923c', '#a78bfa']
 
 interface ChartTTFTProps {
   results: EndpointResult[]
@@ -34,8 +34,8 @@ export function ChartTTFT({ results }: ChartTTFTProps) {
       <CardHeader>
         <CardTitle>TTFT (ms)</CardTitle>
       </CardHeader>
-      <CardContent className="p-4 sm:p-6">
-        <ResponsiveContainer width="100%" height={260}>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={240}>
           <BarChart data={data} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
             <XAxis
@@ -52,18 +52,17 @@ export function ChartTTFT({ results }: ChartTTFTProps) {
             <Tooltip
               contentStyle={{
                 backgroundColor: 'var(--color-card)',
-                border: '2px solid var(--color-border)',
-                borderRadius: 0,
+                border: '1px solid var(--color-border)',
+                borderRadius: '6px',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '12px',
-                boxShadow: '4px 4px 0px 0px var(--color-primary)',
               }}
             />
-            <Bar dataKey="median" name="P50" radius={[2, 2, 0, 0]}>
+            <Bar dataKey="median" name="P50" radius={[3, 3, 0, 0]}>
               {data.map(entry => (
-                <Cell key={entry.name} fill={entry.fill} fillOpacity={0.85} />
+                <Cell key={entry.name} fill={entry.fill} fillOpacity={0.8} />
               ))}
-              <ErrorBar dataKey="errorMargin" width={6} strokeWidth={2} stroke="var(--color-foreground)" strokeOpacity={0.4} />
+              <ErrorBar dataKey="errorMargin" width={6} strokeWidth={1.5} stroke="var(--color-foreground)" strokeOpacity={0.3} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
