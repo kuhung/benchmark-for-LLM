@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#0891b2', '#059669', '#e11d48', '#d97706', '#7c3aed']
+const COLORS = ['#ccff00', '#00f0ff', '#ff0055', '#ff9900', '#b000ff']
 
 interface ChartThroughputProps {
   results: EndpointResult[]
@@ -39,51 +39,53 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>并发退化曲线</CardTitle>
+        <CardTitle>Concurrency Degradation</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div>
-            <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">TPS vs 并发数</p>
+      <CardContent className="p-4 sm:p-6">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="border-2 border-border bg-background p-4">
+            <p className="mb-4 text-xs font-bold uppercase text-muted-foreground border-b-2 border-border pb-2">TPS vs Concurrency</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="concurrency" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Legend />
+                <XAxis dataKey="concurrency" tick={{ fontSize: 12, fontFamily: 'var(--font-mono)' }} />
+                <YAxis tick={{ fontSize: 12, fontFamily: 'var(--font-mono)' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--color-card)', border: '2px solid var(--color-border)', borderRadius: 0, fontFamily: 'var(--font-mono)' }} />
+                <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }} />
                 {results.map((r, i) => (
                   <Line
                     key={r.endpoint.id}
-                    type="monotone"
+                    type="step"
                     dataKey={`${r.endpoint.name}_tps`}
                     name={r.endpoint.name}
                     stroke={COLORS[i % COLORS.length]}
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
+                    strokeWidth={3}
+                    dot={{ r: 0 }}
+                    activeDot={{ r: 6, strokeWidth: 0, fill: COLORS[i % COLORS.length] }}
                   />
                 ))}
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div>
-            <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">TTFT vs 并发数 (ms)</p>
+          <div className="border-2 border-border bg-background p-4">
+            <p className="mb-4 text-xs font-bold uppercase text-muted-foreground border-b-2 border-border pb-2">TTFT vs Concurrency (ms)</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="concurrency" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Legend />
+                <XAxis dataKey="concurrency" tick={{ fontSize: 12, fontFamily: 'var(--font-mono)' }} />
+                <YAxis tick={{ fontSize: 12, fontFamily: 'var(--font-mono)' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--color-card)', border: '2px solid var(--color-border)', borderRadius: 0, fontFamily: 'var(--font-mono)' }} />
+                <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }} />
                 {results.map((r, i) => (
                   <Line
                     key={r.endpoint.id}
-                    type="monotone"
+                    type="step"
                     dataKey={`${r.endpoint.name}_ttft`}
                     name={r.endpoint.name}
                     stroke={COLORS[i % COLORS.length]}
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
+                    strokeWidth={3}
+                    dot={{ r: 0 }}
+                    activeDot={{ r: 6, strokeWidth: 0, fill: COLORS[i % COLORS.length] }}
                   />
                 ))}
               </LineChart>

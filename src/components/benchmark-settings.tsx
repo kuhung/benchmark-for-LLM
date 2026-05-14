@@ -14,13 +14,10 @@ interface BenchmarkSettingsProps {
 
 export function BenchmarkSettings({ config, onChange, compact = false }: BenchmarkSettingsProps) {
   return (
-    <Card className={compact ? 'h-full' : undefined}>
-      <CardHeader>
-        <CardTitle>测评参数</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5">
+    <div className={compact ? 'h-full flex flex-col' : 'space-y-5'}>
+      <div className="flex-1 space-y-5">
         <div>
-          <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">测试 Prompt</label>
+          <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">Test Prompt</label>
           <div className="mb-3 flex flex-wrap gap-2">
             {PROMPT_PRESETS.map(preset => (
               <Button
@@ -28,21 +25,22 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
                 variant={config.prompt === preset.content ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onChange({ ...config, prompt: preset.content })}
+                className="text-xs"
               >
                 {preset.label}
               </Button>
             ))}
           </div>
           <textarea
-            className={`${compact ? 'h-32' : 'h-24'} w-full resize-none rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm leading-6 shadow-inner shadow-black/5 transition-all placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/10`}
+            className={`${compact ? 'h-32' : 'h-24'} w-full resize-none border-2 border-border bg-background p-3 text-sm font-mono leading-6 transition-all placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-0`}
             value={config.prompt}
             onChange={e => onChange({ ...config, prompt: e.target.value })}
-            placeholder="输入自定义 Prompt..."
+            placeholder="Enter custom prompt..."
           />
         </div>
-        <div className={`grid grid-cols-1 ${compact ? 'gap-3' : 'md:grid-cols-3 gap-4'}`}>
+        <div className={`grid grid-cols-1 ${compact ? 'gap-4' : 'md:grid-cols-3 gap-5'}`}>
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">最大输出 Tokens</label>
+            <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">Max Tokens</label>
             <Input
               type="number"
               value={config.maxTokens}
@@ -52,7 +50,7 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">重复次数</label>
+            <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">Repeat Count</label>
             <Input
               type="number"
               value={config.repeatCount}
@@ -62,14 +60,14 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">并发级别</label>
-            <div className="flex gap-1 rounded-full border border-border bg-muted p-1">
+            <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">Concurrency</label>
+            <div className="flex gap-2 bg-background">
               {[1, 2, 4, 8].map(level => (
                 <Button
                   key={level}
                   variant={config.concurrencyLevels.includes(level) ? 'default' : 'outline'}
                   size="sm"
-                  className="h-8 flex-1 px-2"
+                  className="h-10 flex-1 px-2 font-mono"
                   onClick={() => {
                     const levels = config.concurrencyLevels.includes(level)
                       ? config.concurrencyLevels.filter(l => l !== level)
@@ -83,7 +81,7 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

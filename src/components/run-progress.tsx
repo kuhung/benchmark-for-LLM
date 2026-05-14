@@ -18,48 +18,69 @@ export function RunProgress({ progress, onCancel }: RunProgressProps) {
     : 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="mx-4 w-full max-w-md space-y-4 rounded-lg border border-border bg-card p-6 shadow-xl shadow-black/10">
-        <div className="flex items-center gap-3">
-          <Loader2 className="h-5 w-5 animate-spin text-primary" />
-          <h3 className="font-semibold">测评进行中</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md">
+      <div className="mx-4 w-full max-w-md space-y-6 border-2 border-primary bg-card p-6 shadow-[8px_8px_0px_0px_var(--color-primary)]">
+        <div className="flex items-center gap-3 border-b-2 border-border pb-4">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <h3 className="text-lg font-bold uppercase tracking-widest">Running Benchmark</h3>
         </div>
 
-        <Progress value={percent} />
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs font-bold uppercase font-mono">
+            <span>Progress</span>
+            <span>{percent}%</span>
+          </div>
+          <div className="h-4 w-full border-2 border-border bg-muted overflow-hidden">
+            <div 
+              className="h-full bg-primary transition-all duration-300 ease-out"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+        </div>
 
-        <div className="text-sm text-muted-foreground space-y-1">
-          <p>
-            进度: {progress.completedTasks} / {progress.totalTasks} ({percent}%)
+        <div className="text-sm font-mono text-muted-foreground space-y-2">
+          <p className="flex justify-between border-b border-border/50 pb-1">
+            <span>Tasks</span>
+            <span className="text-foreground">{progress.completedTasks} / {progress.totalTasks}</span>
           </p>
           {progress.currentEndpoint && (
-            <p>当前端点: <span className="text-foreground font-medium">{progress.currentEndpoint}</span></p>
+            <p className="flex justify-between border-b border-border/50 pb-1">
+              <span>Endpoint</span>
+              <span className="text-foreground font-bold">{progress.currentEndpoint}</span>
+            </p>
           )}
           {progress.currentRound && progress.totalRounds && (
-            <p>轮次: {progress.currentRound} / {progress.totalRounds}</p>
+            <p className="flex justify-between border-b border-border/50 pb-1">
+              <span>Round</span>
+              <span className="text-foreground">{progress.currentRound} / {progress.totalRounds}</span>
+            </p>
           )}
           {progress.currentConcurrency && (
-            <p>并发: {progress.currentConcurrency}x</p>
+            <p className="flex justify-between border-b border-border/50 pb-1">
+              <span>Concurrency</span>
+              <span className="text-primary font-bold">{progress.currentConcurrency}x</span>
+            </p>
           )}
           {progress.liveMetrics && (
-            <div className="grid grid-cols-2 gap-2 pt-2">
+            <div className="grid grid-cols-2 gap-4 pt-4">
               {typeof progress.liveMetrics.ttft === 'number' && (
-                <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
-                  <p className="text-xs">最新 TTFT</p>
-                  <p className="text-foreground font-semibold">{progress.liveMetrics.ttft.toFixed(0)} ms</p>
+                <div className="border-2 border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Live TTFT</p>
+                  <p className="text-lg text-foreground font-bold">{progress.liveMetrics.ttft.toFixed(0)} <span className="text-xs font-normal">ms</span></p>
                 </div>
               )}
               {typeof progress.liveMetrics.tps === 'number' && (
-                <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
-                  <p className="text-xs">最新 TPS</p>
-                  <p className="text-foreground font-semibold">{progress.liveMetrics.tps.toFixed(1)}</p>
+                <div className="border-2 border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Live TPS</p>
+                  <p className="text-lg text-foreground font-bold">{progress.liveMetrics.tps.toFixed(1)}</p>
                 </div>
               )}
             </div>
           )}
         </div>
 
-        <Button variant="destructive" size="sm" onClick={onCancel} className="w-full">
-          <XCircle className="h-4 w-4" /> 取消测评
+        <Button variant="destructive" size="lg" onClick={onCancel} className="w-full">
+          <XCircle className="h-5 w-5 mr-2" /> ABORT_RUN
         </Button>
       </div>
     </div>

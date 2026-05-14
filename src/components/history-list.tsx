@@ -54,52 +54,52 @@ export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
         setImportError(null)
         await loadSessions()
       } catch (err) {
-        setImportError(err instanceof Error ? err.message : '导入失败，请检查 JSON 格式')
+        setImportError(err instanceof Error ? err.message : 'Import failed. Check JSON format.')
       }
     }
     input.click()
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>历史记录</span>
-          <Button variant="outline" size="sm" onClick={handleImport}>
-            <Upload className="h-4 w-4" /> 导入 JSON
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="brutalist-border bg-card p-0">
+      <div className="border-b-2 border-border bg-muted px-4 py-3 flex items-center justify-between">
+        <span className="font-bold uppercase tracking-widest text-sm">SYS.HISTORY</span>
+        <Button variant="outline" size="sm" onClick={handleImport} className="h-8">
+          <Upload className="h-4 w-4 mr-2" /> IMPORT_JSON
+        </Button>
+      </div>
+      <div className="p-4 sm:p-6">
         {importError && (
-          <div className="mb-3 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {importError}
+          <div className="mb-4 border-2 border-destructive bg-destructive/10 px-4 py-3 text-sm font-bold text-destructive uppercase">
+            [ERROR] {importError}
           </div>
         )}
         {sessions.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">
-            暂无历史记录。完成一次测评后保存即可在此查看。
-          </p>
+          <div className="border-2 border-dashed border-border p-8 text-center">
+            <p className="text-sm font-mono text-muted-foreground">
+              [ NO_HISTORY_FOUND ]
+            </p>
+          </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-4">
             {sessions.map(session => (
-              <div key={session.id} className="flex flex-col gap-3 rounded-lg border border-border bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div key={session.id} className="flex flex-col gap-4 border-2 border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between hover:border-primary/50 transition-colors">
                 <div>
-                  <p className="text-sm font-semibold text-foreground">
+                  <p className="text-sm font-bold text-foreground font-mono">
                     {new Date(session.timestamp).toLocaleString('zh-CN')}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {session.results.length} 个端点 | {session.config.repeatCount} 次重复 | 并发 {session.config.concurrencyLevels.join('/')}
+                  <p className="text-xs font-mono text-muted-foreground mt-1">
+                    &gt; {session.results.length} ENDPOINTS | {session.config.repeatCount}x REPEATS | CONC: {session.config.concurrencyLevels.join('/')}
                   </p>
                 </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onView(session)}>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="icon" className="h-10 w-10" onClick={() => onView(session)} title="View">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExport(session)}>
+                  <Button variant="outline" size="icon" className="h-10 w-10" onClick={() => handleExport(session)} title="Export">
                     <Download className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(session.id)}>
+                  <Button variant="destructive" size="icon" className="h-10 w-10" onClick={() => handleDelete(session.id)} title="Delete">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -107,7 +107,7 @@ export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

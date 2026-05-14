@@ -27,18 +27,18 @@ export function ChartITL({ results }: ChartITLProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>ITL 输出间隔分布 (ms)</CardTitle>
+        <CardTitle>ITL Distribution (ms)</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6">
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={data} margin={{ top: 10, right: 12, bottom: 10, left: 6 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
-            <Bar dataKey="p50" name="P50" fill="#0891b2" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="p95" name="P95" fill="#d97706" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="p99" name="P99" fill="#e11d48" radius={[6, 6, 0, 0]} />
+            <XAxis dataKey="name" tick={{ fontSize: 12, fontFamily: 'var(--font-mono)' }} />
+            <YAxis tick={{ fontSize: 12, fontFamily: 'var(--font-mono)' }} />
+            <Tooltip contentStyle={{ backgroundColor: 'var(--color-card)', border: '2px solid var(--color-border)', borderRadius: 0, fontFamily: 'var(--font-mono)' }} />
+            <Bar dataKey="p50" name="P50" fill="#ccff00" radius={[0, 0, 0, 0]} />
+            <Bar dataKey="p95" name="P95" fill="#00f0ff" radius={[0, 0, 0, 0]} />
+            <Bar dataKey="p99" name="P99" fill="#ff0055" radius={[0, 0, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

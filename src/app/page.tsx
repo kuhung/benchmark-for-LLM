@@ -50,48 +50,54 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-border/80 bg-card/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+    <main className="min-h-screen pb-20">
+      <header className="sticky top-0 z-40 border-b-2 border-border bg-background/95 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-              <Gauge className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center bg-primary text-primary-foreground brutalist-border">
+              <Gauge className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-sm font-bold leading-tight sm:text-base">LLM Inference Benchmark</h1>
-              <p className="hidden text-xs text-muted-foreground sm:block">浏览器内完成延迟、吞吐和稳定性测评</p>
+              <h1 className="text-base font-bold uppercase tracking-widest sm:text-lg">LLM Inference Benchmark</h1>
+              <p className="hidden text-xs text-muted-foreground font-mono sm:block">SYS.PERF_TEST // RUNNING IN BROWSER</p>
             </div>
           </div>
-          <div className="flex shrink-0 gap-1 rounded-full border border-border bg-muted p-1">
+          <div className="flex shrink-0 gap-2 border-2 border-border bg-muted p-1">
             <button
-              className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === 'new' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'new' ? 'bg-primary text-primary-foreground brutalist-border' : 'text-muted-foreground hover:text-foreground'}`}
               onClick={() => setActiveTab('new')}
             >
-              新建测评
+              [ NEW_TEST ]
             </button>
             <button
-              className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${activeTab === 'history' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'history' ? 'bg-primary text-primary-foreground brutalist-border' : 'text-muted-foreground hover:text-foreground'}`}
               onClick={() => setActiveTab('history')}
             >
-              历史记录
+              [ HISTORY ]
             </button>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl space-y-5 px-4 py-5 sm:py-7">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:py-12">
         {activeTab === 'new' && (
           <>
             {!session && (
               <>
-                <section className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
-                  <div className="rounded-lg border border-border/80 bg-card p-5 shadow-sm shadow-black/5">
-                    <div className="mb-5 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+                <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
+                  <div className="brutalist-border bg-card p-6 sm:p-8">
+                    <div className="mb-8 flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
                       <div>
-                        <p className="text-xs font-bold uppercase text-muted-foreground">Speed lab</p>
-                        <h2 className="mt-2 text-2xl font-bold tracking-normal text-foreground sm:text-3xl">测你的模型服务真实体感</h2>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                          配置 OpenAI-compatible endpoint，直接采集 TTFT、TPS、ITL 和并发退化曲线。
+                        <div className="inline-block border-2 border-primary px-2 py-1 text-xs font-bold uppercase text-primary mb-4">
+                          Speed Lab
+                        </div>
+                        <h2 className="text-3xl font-bold uppercase tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+                          MEASURE <span className="text-primary">REAL</span> FEEL
+                        </h2>
+                        <p className="mt-4 max-w-2xl text-sm font-mono leading-relaxed text-muted-foreground">
+                          &gt; Configure OpenAI-compatible endpoints.
+                          <br />
+                          &gt; Capture TTFT, TPS, ITL, and concurrency degradation.
                         </p>
                       </div>
                       <Button
@@ -100,43 +106,58 @@ export default function Home() {
                         onClick={startBenchmark}
                         disabled={endpoints.length === 0 || progress.status === 'running'}
                       >
-                        <Play className="h-4 w-4" /> 开始测评
+                        <Play className="h-5 w-5 mr-2 fill-current" /> EXECUTE_RUN
                       </Button>
                     </div>
-                    <div className="grid gap-3 md:grid-cols-4">
-                      <div className="rounded-lg border border-border bg-muted/40 p-4">
-                        <Activity className="mb-3 h-4 w-4 text-cyan-600" />
-                        <p className="text-sm font-bold">流式采样</p>
-                        <p className="mt-1 text-xs text-muted-foreground">逐 token 记录到达时间</p>
+                    <div className="grid gap-4 md:grid-cols-4">
+                      <div className="border-2 border-border bg-background p-5 transition-colors hover:border-cyan-500">
+                        <Activity className="mb-4 h-6 w-6 text-cyan-500" />
+                        <p className="text-sm font-bold uppercase">Stream Sample</p>
+                        <p className="mt-2 font-mono text-xs text-muted-foreground">Token-by-token timing</p>
                       </div>
-                      <div className="rounded-lg border border-border bg-muted/40 p-4">
-                        <ShieldCheck className="mb-3 h-4 w-4 text-emerald-600" />
-                        <p className="text-sm font-bold">本地隐私</p>
-                        <p className="mt-1 text-xs text-muted-foreground">API Key 不离开浏览器</p>
+                      <div className="border-2 border-border bg-background p-5 transition-colors hover:border-emerald-500">
+                        <ShieldCheck className="mb-4 h-6 w-6 text-emerald-500" />
+                        <p className="text-sm font-bold uppercase">Local Privacy</p>
+                        <p className="mt-2 font-mono text-xs text-muted-foreground">Keys stay in browser</p>
                       </div>
-                      <div className="rounded-lg border border-border bg-muted/40 p-4">
-                        <Database className="mb-3 h-4 w-4 text-rose-600" />
-                        <p className="text-sm font-bold">可导入导出</p>
-                        <p className="mt-1 text-xs text-muted-foreground">Web 与 CLI 结果兼容</p>
+                      <div className="border-2 border-border bg-background p-5 transition-colors hover:border-rose-500">
+                        <Database className="mb-4 h-6 w-6 text-rose-500" />
+                        <p className="text-sm font-bold uppercase">Exportable</p>
+                        <p className="mt-2 font-mono text-xs text-muted-foreground">Web & CLI compatible</p>
                       </div>
-                      <div className="rounded-lg border border-primary bg-primary p-4 text-white">
-                        <Zap className="mb-3 h-4 w-4 text-sky-300" />
-                        <p className="text-sm font-bold">{config.concurrencyLevels.length} 组并发</p>
-                        <p className="mt-1 text-xs text-primary-foreground/70">{config.repeatCount} 次重复，最多 {config.maxTokens} tokens</p>
+                      <div className="border-2 border-primary bg-primary p-5 text-primary-foreground shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
+                        <Zap className="mb-4 h-6 w-6 text-primary-foreground" />
+                        <p className="text-sm font-bold uppercase">{config.concurrencyLevels.length} Threads</p>
+                        <p className="mt-2 font-mono text-xs opacity-80">{config.repeatCount}x / {config.maxTokens}t</p>
                       </div>
                     </div>
                   </div>
-                  <BenchmarkSettings config={config} onChange={setConfig} compact />
+                  <div className="brutalist-border bg-card p-0">
+                    <div className="border-b-2 border-border bg-muted px-4 py-2">
+                      <p className="font-mono text-xs font-bold uppercase text-muted-foreground">SYS.CONFIG</p>
+                    </div>
+                    <div className="p-4">
+                      <BenchmarkSettings config={config} onChange={setConfig} compact />
+                    </div>
+                  </div>
                 </section>
 
-                <EndpointConfig endpoints={endpoints} onChange={setEndpoints} />
+                <div className="brutalist-border bg-card p-0">
+                  <div className="border-b-2 border-border bg-muted px-4 py-2">
+                    <p className="font-mono text-xs font-bold uppercase text-muted-foreground">SYS.ENDPOINTS</p>
+                  </div>
+                  <div className="p-4 sm:p-6">
+                    <EndpointConfig endpoints={endpoints} onChange={setEndpoints} />
+                  </div>
+                </div>
+
                 <Button
                   size="lg"
                   className="w-full md:hidden"
                   onClick={startBenchmark}
                   disabled={endpoints.length === 0 || progress.status === 'running'}
                 >
-                  <Play className="h-4 w-4" /> 开始测评
+                  <Play className="h-5 w-5 mr-2 fill-current" /> EXECUTE_RUN
                 </Button>
               </>
             )}
@@ -144,8 +165,8 @@ export default function Home() {
             {session && (
               <>
                 <ResultDashboard session={session} onSaved={() => setHistoryRefresh(n => n + 1)} />
-                <Button variant="outline" className="w-full" onClick={() => setSession(null)}>
-                  重新测评
+                <Button variant="outline" size="lg" className="w-full" onClick={() => setSession(null)}>
+                  [ NEW_RUN ]
                 </Button>
               </>
             )}

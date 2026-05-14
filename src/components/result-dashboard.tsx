@@ -38,41 +38,43 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
   const avgSuccess = session.results.reduce((sum, r) => sum + r.singleConcurrency.successRate, 0) / session.results.length
 
   return (
-    <div className="space-y-5">
-      <div className="rounded-lg border border-border bg-card p-5 shadow-sm shadow-black/5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-6">
+      <div className="brutalist-border bg-card p-6 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase text-muted-foreground">Benchmark report</p>
-            <h2 className="mt-1 text-2xl font-bold text-foreground">测评结果</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {session.results.length} 个端点，{session.config.repeatCount} 次重复，并发 {session.config.concurrencyLevels.join('/')}
+            <div className="inline-block border-2 border-primary px-2 py-1 text-xs font-bold uppercase text-primary mb-3">
+              Report
+            </div>
+            <h2 className="text-3xl font-bold uppercase tracking-tight text-foreground">BENCHMARK_RESULTS</h2>
+            <p className="mt-2 font-mono text-sm text-muted-foreground">
+              &gt; {session.results.length} ENDPOINTS | {session.config.repeatCount}x REPEATS | CONCURRENCY: {session.config.concurrencyLevels.join('/')}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             <Button variant="outline" size="sm" onClick={handleSave}>
-              <Save className="h-4 w-4" /> 保存到历史
+              <Save className="h-4 w-4 mr-2" /> SAVE_TO_HISTORY
             </Button>
             <Button variant="outline" size="sm" onClick={handleExport}>
-              <Download className="h-4 w-4" /> 导出 JSON
+              <Download className="h-4 w-4 mr-2" /> EXPORT_JSON
             </Button>
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border border-border bg-muted/40 p-4">
-            <Timer className="mb-3 h-4 w-4 text-cyan-600" />
-            <p className="text-xs font-bold uppercase text-muted-foreground">最佳 TTFT</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{bestTtft.toFixed(0)} ms</p>
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="border-2 border-border bg-background p-5 hover:border-cyan-500 transition-colors">
+            <Timer className="mb-4 h-6 w-6 text-cyan-500" />
+            <p className="text-xs font-bold uppercase text-muted-foreground">Best TTFT</p>
+            <p className="mt-2 text-3xl font-bold text-foreground font-mono">{bestTtft.toFixed(0)} <span className="text-sm font-normal text-muted-foreground">ms</span></p>
           </div>
-          <div className="rounded-lg border border-border bg-muted/40 p-4">
-            <Zap className="mb-3 h-4 w-4 text-emerald-600" />
-            <p className="text-xs font-bold uppercase text-muted-foreground">最佳 TPS</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{bestTps.toFixed(1)}</p>
+          <div className="border-2 border-border bg-background p-5 hover:border-emerald-500 transition-colors">
+            <Zap className="mb-4 h-6 w-6 text-emerald-500" />
+            <p className="text-xs font-bold uppercase text-muted-foreground">Best TPS</p>
+            <p className="mt-2 text-3xl font-bold text-foreground font-mono">{bestTps.toFixed(1)}</p>
           </div>
-          <div className="rounded-lg border border-primary bg-primary p-4 text-white">
-            <Gauge className="mb-3 h-4 w-4 text-sky-300" />
-            <p className="text-xs font-bold uppercase text-primary-foreground/60">平均成功率</p>
-            <p className="mt-1 text-2xl font-bold">{avgSuccess.toFixed(0)}%</p>
+          <div className="border-2 border-primary bg-primary p-5 text-primary-foreground shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
+            <Gauge className="mb-4 h-6 w-6 text-primary-foreground" />
+            <p className="text-xs font-bold uppercase text-primary-foreground/80">Avg Success Rate</p>
+            <p className="mt-2 text-3xl font-bold font-mono">{avgSuccess.toFixed(0)}%</p>
           </div>
         </div>
       </div>
@@ -81,7 +83,7 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
         <ChartRadar results={session.results} />
       )}
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <ChartTTFT results={session.results} />
         <ChartTPS results={session.results} />
       </div>
@@ -89,42 +91,40 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
       <ChartITL results={session.results} />
       <ChartThroughput results={session.results} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-cyan-600" />
-            原始数据摘要
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto rounded-lg border border-border">
-            <table className="w-full min-w-[720px] text-sm">
-              <thead className="bg-muted/40">
-                <tr className="border-b border-border">
-                  <th className="px-4 py-3 text-left text-xs font-bold uppercase text-muted-foreground">端点</th>
-                  <th className="px-4 py-3 text-right text-xs font-bold uppercase text-muted-foreground">TTFT (ms)</th>
-                  <th className="px-4 py-3 text-right text-xs font-bold uppercase text-muted-foreground">TPS</th>
-                  <th className="px-4 py-3 text-right text-xs font-bold uppercase text-muted-foreground">ITL P95 (ms)</th>
-                  <th className="px-4 py-3 text-right text-xs font-bold uppercase text-muted-foreground">E2E (ms)</th>
-                  <th className="px-4 py-3 text-right text-xs font-bold uppercase text-muted-foreground">成功率</th>
+      <div className="brutalist-border bg-card p-0">
+        <div className="border-b-2 border-border bg-muted px-4 py-3 flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-cyan-500" />
+          <span className="font-bold uppercase tracking-widest text-sm">RAW_DATA_SUMMARY</span>
+        </div>
+        <div className="p-4 sm:p-6">
+          <div className="overflow-x-auto border-2 border-border">
+            <table className="w-full min-w-[720px] text-sm font-mono">
+              <thead className="bg-muted border-b-2 border-border">
+                <tr>
+                  <th className="px-4 py-3 text-left font-bold uppercase text-muted-foreground">Endpoint</th>
+                  <th className="px-4 py-3 text-right font-bold uppercase text-muted-foreground">TTFT (ms)</th>
+                  <th className="px-4 py-3 text-right font-bold uppercase text-muted-foreground">TPS</th>
+                  <th className="px-4 py-3 text-right font-bold uppercase text-muted-foreground">ITL P95 (ms)</th>
+                  <th className="px-4 py-3 text-right font-bold uppercase text-muted-foreground">E2E (ms)</th>
+                  <th className="px-4 py-3 text-right font-bold uppercase text-muted-foreground">Success</th>
                 </tr>
               </thead>
               <tbody>
                 {session.results.map(r => (
-                  <tr key={r.endpoint.id} className="border-b border-border/70 last:border-0">
-                    <td className="px-4 py-3 font-semibold text-foreground">{r.endpoint.name}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{r.singleConcurrency.ttft.median.toFixed(0)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{r.singleConcurrency.tps.median.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{r.singleConcurrency.itl.p95.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{r.singleConcurrency.e2eLatency.median.toFixed(0)}</td>
-                    <td className="px-4 py-3 text-right font-semibold tabular-nums">{r.singleConcurrency.successRate.toFixed(0)}%</td>
+                  <tr key={r.endpoint.id} className="border-b-2 border-border/50 last:border-0 hover:bg-accent/50 transition-colors">
+                    <td className="px-4 py-4 font-bold text-foreground">{r.endpoint.name}</td>
+                    <td className="px-4 py-4 text-right">{r.singleConcurrency.ttft.median.toFixed(0)}</td>
+                    <td className="px-4 py-4 text-right text-emerald-500">{r.singleConcurrency.tps.median.toFixed(1)}</td>
+                    <td className="px-4 py-4 text-right text-cyan-500">{r.singleConcurrency.itl.p95.toFixed(1)}</td>
+                    <td className="px-4 py-4 text-right">{r.singleConcurrency.e2eLatency.median.toFixed(0)}</td>
+                    <td className="px-4 py-4 text-right font-bold">{r.singleConcurrency.successRate.toFixed(0)}%</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
