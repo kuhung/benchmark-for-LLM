@@ -2,7 +2,6 @@
 
 import { BenchmarkConfig } from '@/lib/benchmark/types'
 import { PROMPT_PRESETS } from '@/lib/prompts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
@@ -17,22 +16,22 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
     <div className={compact ? 'h-full flex flex-col' : 'space-y-5'}>
       <div className="flex-1 space-y-5">
         <div>
-          <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">Test Prompt</label>
-          <div className="mb-3 flex flex-wrap gap-2">
+          <label className="mb-1.5 block text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wider">Test Prompt</label>
+          <div className="mb-3 flex flex-wrap gap-1.5">
             {PROMPT_PRESETS.map(preset => (
               <Button
                 key={preset.id}
                 variant={config.prompt === preset.content ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onChange({ ...config, prompt: preset.content })}
-                className="text-xs"
+                className="text-[10px] h-7 px-2.5"
               >
                 {preset.label}
               </Button>
             ))}
           </div>
           <textarea
-            className={`${compact ? 'h-32' : 'h-24'} w-full resize-none border-2 border-border bg-background p-3 text-sm font-mono leading-6 transition-all placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-0`}
+            className={`${compact ? 'h-28' : 'h-24'} w-full resize-none border-2 border-border bg-background/60 p-3 text-sm font-mono leading-6 transition-all duration-200 placeholder:text-muted-foreground/40 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:shadow-[0_0_12px_rgba(204,255,0,0.08)]`}
             value={config.prompt}
             onChange={e => onChange({ ...config, prompt: e.target.value })}
             placeholder="Enter custom prompt..."
@@ -40,7 +39,7 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
         </div>
         <div className={`grid grid-cols-1 ${compact ? 'gap-4' : 'md:grid-cols-3 gap-5'}`}>
           <div>
-            <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">Max Tokens</label>
+            <label className="mb-1.5 block text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wider">Max Tokens</label>
             <Input
               type="number"
               value={config.maxTokens}
@@ -50,7 +49,7 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
             />
           </div>
           <div>
-            <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">Repeat Count</label>
+            <label className="mb-1.5 block text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wider">Repeat Count</label>
             <Input
               type="number"
               value={config.repeatCount}
@@ -60,14 +59,14 @@ export function BenchmarkSettings({ config, onChange, compact = false }: Benchma
             />
           </div>
           <div>
-            <label className="mb-2 block text-xs font-bold uppercase text-muted-foreground">Concurrency</label>
-            <div className="flex gap-2 bg-background">
+            <label className="mb-1.5 block text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wider">Concurrency</label>
+            <div className="flex gap-1.5">
               {[1, 2, 4, 8].map(level => (
                 <Button
                   key={level}
                   variant={config.concurrencyLevels.includes(level) ? 'default' : 'outline'}
                   size="sm"
-                  className="h-10 flex-1 px-2 font-mono"
+                  className="h-10 flex-1 px-2 font-mono text-xs"
                   onClick={() => {
                     const levels = config.concurrencyLevels.includes(level)
                       ? config.concurrencyLevels.filter(l => l !== level)

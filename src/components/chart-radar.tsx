@@ -16,9 +16,9 @@ const COLORS = ['#ccff00', '#00f0ff', '#ff0055', '#ff9900', '#b000ff']
 const DIMENSIONS = [
   { key: 'speed', label: 'Speed' },
   { key: 'responsiveness', label: 'Response' },
-  { key: 'smoothness', label: 'Smoothness' },
+  { key: 'smoothness', label: 'Smooth' },
   { key: 'scalability', label: 'Scale' },
-  { key: 'stability', label: 'Stability' },
+  { key: 'stability', label: 'Stable' },
 ]
 
 interface ChartRadarProps {
@@ -39,10 +39,11 @@ export function ChartRadar({ results }: ChartRadarProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle>
           Overall Score
+          <span className="flex-1" />
           {results.map(r => r.score && (
-            <span key={r.endpoint.id} className="text-sm font-normal text-muted-foreground ml-2 font-mono">
+            <span key={r.endpoint.id} className="text-[10px] font-normal text-muted-foreground/50 font-mono tracking-wider">
               [{r.endpoint.name}: {r.score.overall}]
             </span>
           ))}
@@ -52,8 +53,16 @@ export function ChartRadar({ results }: ChartRadarProps) {
         <ResponsiveContainer width="100%" height={320}>
           <RadarChart data={data}>
             <PolarGrid stroke="var(--color-border)" gridType="polygon" />
-            <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 12, fontFamily: 'var(--font-mono)', fill: 'var(--color-foreground)' }} />
-            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10, fontFamily: 'var(--font-mono)' }} />
+            <PolarAngleAxis
+              dataKey="dimension"
+              tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
+            />
+            <PolarRadiusAxis
+              angle={90}
+              domain={[0, 100]}
+              tick={{ fontSize: 9, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
+              axisLine={false}
+            />
             {results.map((r, i) => (
               <Radar
                 key={r.endpoint.id}
@@ -61,11 +70,13 @@ export function ChartRadar({ results }: ChartRadarProps) {
                 dataKey={r.endpoint.name}
                 stroke={COLORS[i % COLORS.length]}
                 fill={COLORS[i % COLORS.length]}
-                fillOpacity={0.2}
-                strokeWidth={3}
+                fillOpacity={0.12}
+                strokeWidth={2}
               />
             ))}
-            <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }} />
+            <Legend
+              wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }}
+            />
           </RadarChart>
         </ResponsiveContainer>
       </CardContent>

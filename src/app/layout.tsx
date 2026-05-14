@@ -26,9 +26,15 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className="dark">
       <body className={`${chakra.variable} ${jetbrains.variable} min-h-screen antialiased font-sans`}>
+        <div className="scanline-overlay" />
+        <div className="noise-overlay" />
         {children}
-        <footer className="fixed bottom-2 right-3 text-xs text-muted-foreground opacity-60 font-mono">
-          v{process.env.NEXT_PUBLIC_GIT_VERSION || 'dev'}
+        <footer className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-2">
+          <div className="gradient-line flex-1 opacity-30" />
+          <span className="shrink-0 px-3 text-[10px] text-muted-foreground/50 font-mono tracking-widest uppercase">
+            v{process.env.NEXT_PUBLIC_GIT_VERSION || 'dev'} // kuhung.me
+          </span>
+          <div className="gradient-line flex-1 opacity-30" />
         </footer>
       </body>
     </html>
