@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#a3e635', '#38bdf8', '#f472b6', '#fb923c', '#a78bfa']
+const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 const DIMENSIONS = [
   { key: 'speed', label: 'Speed' },
   { key: 'responsiveness', label: 'Response' },
@@ -30,7 +30,8 @@ export function ChartRadar({ results }: ChartRadarProps) {
     const entry: Record<string, string | number> = { dimension: dim.label }
     results.forEach(r => {
       if (r.score) {
-        entry[r.endpoint.name] = r.score[dim.key as keyof typeof r.score]
+        const keyName = `${r.endpoint.name} (${r.endpoint.modelId})`
+        entry[keyName] = r.score[dim.key as keyof typeof r.score]
       }
     })
     return entry
@@ -43,7 +44,7 @@ export function ChartRadar({ results }: ChartRadarProps) {
           Overall Score
           {results.map(r => r.score && (
             <span key={r.endpoint.id} className="ml-3 text-xs font-normal text-muted-foreground font-mono">
-              {r.endpoint.name}: {r.score.overall}
+              {r.endpoint.name} ({r.endpoint.modelId}): {r.score.overall}
             </span>
           ))}
         </CardTitle>
@@ -51,28 +52,31 @@ export function ChartRadar({ results }: ChartRadarProps) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <RadarChart data={data}>
-            <PolarGrid stroke="var(--color-border)" gridType="polygon" />
+            <PolarGrid stroke="var(--border)" gridType="polygon" />
             <PolarAngleAxis
               dataKey="dimension"
-              tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
+              tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
             />
             <PolarRadiusAxis
               angle={90}
               domain={[0, 100]}
-              tick={{ fontSize: 9, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
+              tick={{ fontSize: 9, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
               axisLine={false}
             />
-            {results.map((r, i) => (
-              <Radar
-                key={r.endpoint.id}
-                name={r.endpoint.name}
-                dataKey={r.endpoint.name}
-                stroke={COLORS[i % COLORS.length]}
-                fill={COLORS[i % COLORS.length]}
-                fillOpacity={0.1}
-                strokeWidth={2}
-              />
-            ))}
+            {results.map((r, i) => {
+              const keyName = `${r.endpoint.name} (${r.endpoint.modelId})`
+              return (
+                <Radar
+                  key={r.endpoint.id}
+                  name={keyName}
+                  dataKey={keyName}
+                  stroke={ECHARTS_COLORS[i % ECHARTS_COLORS.length]}
+                  fill={ECHARTS_COLORS[i % ECHARTS_COLORS.length]}
+                  fillOpacity={0.1}
+                  strokeWidth={2}
+                />
+              )
+            })}
             <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }} />
           </RadarChart>
         </ResponsiveContainer>

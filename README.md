@@ -231,12 +231,22 @@ graph TB
 - TTFT、TPS、ITL 分布、并发退化曲线和原始摘要表
 - IndexedDB 历史保存、删除、查看、JSON 导入/导出
 - Python CLI Runner 输出 Web 端兼容 JSON
+- Raw Data 表格动态颜色高亮（性能色彩编码，最优绿色/最差红色）
+- CSV 导出（端点摘要 + 并发数据）
+- Markdown 性能报告自动生成（含 IQR、雷达评分、并发扩展）
+- 流式输出细节指标采集（Avg Chars/Chunk、Avg Chunk Interval）
+- TTFT 延迟分位数阶梯图（P50/P75/P90/P95/P99 多端点叠加）
+- 历史 Session 对比（勾选 2-4 个 Session 侧对比，含对比图表和明细表）
 
 仍未实现或需后续增强：
 
-- 延迟分位数阶梯图尚未单独实现，当前通过表格和 ITL/TTFT 图展示关键分位数
 - 原始逐请求明细表尚未展开，当前展示端点级摘要
 - 浏览器端仍依赖目标服务开启 CORS；无法开启时应使用 Python Runner
+- 性能趋势折线图（选定端点的历史 TTFT/TPS 时间趋势）
+- 结果快照分享（URL Fragment 压缩分享）
+- Prompt 长度 vs 延迟散点图
+- 并发压测热力图
+- 跨模型精准 Token 计数
 
 ---
 
@@ -253,10 +263,12 @@ benchmark-for-LLM/
 │   │   ├── benchmark/
 │   │   │   ├── runner.ts               # 核心：单次流式请求 + 逐 token 计时
 │   │   │   ├── orchestrator.ts         # 编排：多端点、多轮、多并发调度
-│   │   │   ├── metrics.ts              # 指标聚合（P50/P95/P99, TPS, ITL）
+│   │   │   ├── metrics.ts              # 指标聚合（P50/P75/P90/P95/P99, TPS, ITL, 流式细节）
 │   │   │   ├── sse-parser.ts           # SSE 流解析器
 │   │   │   ├── scoring.ts              # 综合评分（五维雷达图，阈值可配）
 │   │   │   └── types.ts                # TypeScript 类型定义
+│   │   ├── export-csv.ts               # CSV 导出
+│   │   ├── report.ts                   # Markdown 性能报告生成
 │   │   ├── prompts.ts                  # 内置测试 Prompt 集
 │   │   └── store.ts                    # IndexedDB 存取封装
 │   └── components/
@@ -265,11 +277,14 @@ benchmark-for-LLM/
 │       ├── benchmark-settings.tsx       # 测评参数面板
 │       ├── run-progress.tsx             # 测评进度 Modal
 │       ├── result-dashboard.tsx         # 结果总览
+│       ├── raw-data-table.tsx           # 动态颜色高亮数据表
 │       ├── chart-ttft.tsx               # TTFT 对比图
 │       ├── chart-tps.tsx                # TPS 对比图
 │       ├── chart-itl.tsx                # ITL 分布图
+│       ├── chart-percentile.tsx         # 延迟分位数阶梯图
 │       ├── chart-throughput.tsx         # 并发吞吐曲线
 │       ├── chart-radar.tsx              # 雷达图
+│       ├── compare-view.tsx             # 历史 Session 对比视图
 │       └── history-list.tsx             # 历史记录与 JSON 导入/导出
 ├── runner/
 │   ├── benchmark_runner.py             # Python CLI Runner 主入口

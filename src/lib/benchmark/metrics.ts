@@ -1,4 +1,4 @@
-import { RawResult, SingleMetrics, AggregatedMetrics, StatsSummary } from './types'
+import { RawResult, SingleMetrics, AggregatedMetrics, StatsSummary, StreamingDetails } from './types'
 
 export function computeSingleMetrics(raw: RawResult): SingleMetrics | null {
   if (raw.status !== 'success' || raw.tokenTimestamps.length === 0) return null
@@ -59,6 +59,8 @@ export function computeStats(values: number[]): StatsSummary {
   return {
     mean,
     median: percentile(sorted, 50),
+    p75: percentile(sorted, 75),
+    p90: percentile(sorted, 90),
     p95: percentile(sorted, 95),
     p99: percentile(sorted, 99),
     min: sorted[0],
@@ -78,5 +80,35 @@ function percentile(sorted: number[], p: number): number {
 }
 
 function emptyStats(): StatsSummary {
-  return { mean: 0, median: 0, p95: 0, p99: 0, min: 0, max: 0, stdDev: 0 }
+  return { mean: 0, median: 0, p75: 0, p90: 0, p95: 0, p99: 0, min: 0, max: 0, stdDev: 0 }
+}
+
+export function computeStreamingDetails(rawResults: RawResult[]): StreamingDetails | undefined {
+  const successful = rawResults.filter(r => r.status === 'success' && r.tokenTimestamps.length > 1)
+  if (successful.length === 0) return undefined
+
+  let totalChunks = 0
+  let totalChars = 0
+  const allIntervals: number[] = []
+
+  for (const raw of successful) {
+    totalChunks += raw.tokenTimestamps.length
+    if (raw.chunkSizes) {
+      totalChars += raw.chunkSizes.reduce((a, b) => a + b, 0)
+    }
+    for (let i = 1; i < raw.tokenTimestamps.length; i++) {
+      allIntervals.push(raw.tokenTimestamps[i] - raw.tokenTimestamps[i - 1])
+    }
+  }
+
+  const avgCharsPerChunk = totalChunks > 0 && totalChars > 0 ? totalChars / totalChunks : 0
+  const avgChunkInterval = allIntervals.length > 0
+    ? allIntervals.reduce((a, b) => a + b, 0) / allIntervals.length
+    : 0
+
+  return {
+    chunkCount: Math.round(totalChunks / successful.length),
+    avgCharsPerChunk: Number(avgCharsPerChunk.toFixed(1)),
+    avgChunkInterval: Number(avgChunkInterval.toFixed(1)),
+  }
 }

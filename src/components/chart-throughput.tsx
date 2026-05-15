@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#a3e635', '#38bdf8', '#f472b6', '#fb923c', '#a78bfa']
+const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 
 interface ChartThroughputProps {
   results: EndpointResult[]
@@ -27,8 +27,9 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
     results.forEach(r => {
       const cr = r.concurrencyResults.find(c => c.concurrency === concurrency)
       if (cr) {
-        entry[`${r.endpoint.name}_tps`] = Number(cr.metrics.tps.median.toFixed(1))
-        entry[`${r.endpoint.name}_ttft`] = Number(cr.metrics.ttft.median.toFixed(0))
+        const keyName = `${r.endpoint.name} (${r.endpoint.modelId})`
+        entry[`${keyName}_tps`] = Number(cr.metrics.tps.median.toFixed(1))
+        entry[`${keyName}_ttft`] = Number(cr.metrics.ttft.median.toFixed(0))
       }
     })
     return entry
@@ -37,11 +38,16 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
   if (allConcurrencies.length < 2) return null
 
   const tooltipStyle = {
-    backgroundColor: 'var(--color-card)',
-    border: '1px solid var(--color-border)',
+    backgroundColor: 'var(--card)',
+    border: '1px solid var(--border)',
     borderRadius: '6px',
     fontFamily: 'var(--font-mono)',
     fontSize: '12px',
+  }
+
+  const tooltipLabelStyle = {
+    color: 'var(--foreground)',
+    marginBottom: '4px',
   }
 
   return (
@@ -55,32 +61,35 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
             <p className="mb-3 text-xs text-muted-foreground">TPS vs Concurrency</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
                 <XAxis
                   dataKey="concurrency"
-                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
-                  axisLine={{ stroke: 'var(--color-border)' }}
+                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
+                  axisLine={{ stroke: 'var(--border)' }}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
-                  axisLine={{ stroke: 'var(--color-border)' }}
+                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
+                  axisLine={{ stroke: 'var(--border)' }}
                   tickLine={false}
                 />
-                <Tooltip contentStyle={tooltipStyle} />
+                <Tooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} />
                 <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }} />
-                {results.map((r, i) => (
-                  <Line
-                    key={r.endpoint.id}
-                    type="monotone"
-                    dataKey={`${r.endpoint.name}_tps`}
-                    name={r.endpoint.name}
-                    stroke={COLORS[i % COLORS.length]}
-                    strokeWidth={2}
-                    dot={{ r: 3, strokeWidth: 0, fill: COLORS[i % COLORS.length] }}
-                    activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--color-background)', fill: COLORS[i % COLORS.length] }}
-                  />
-                ))}
+                {results.map((r, i) => {
+                  const keyName = `${r.endpoint.name} (${r.endpoint.modelId})`
+                  return (
+                    <Line
+                      key={r.endpoint.id}
+                      type="monotone"
+                      dataKey={`${keyName}_tps`}
+                      name={keyName}
+                      stroke={ECHARTS_COLORS[i % ECHARTS_COLORS.length]}
+                      strokeWidth={2}
+                      dot={{ r: 3, strokeWidth: 0, fill: ECHARTS_COLORS[i % ECHARTS_COLORS.length] }}
+                      activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--background)', fill: ECHARTS_COLORS[i % ECHARTS_COLORS.length] }}
+                    />
+                  )
+                })}
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -88,32 +97,35 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
             <p className="mb-3 text-xs text-muted-foreground">TTFT vs Concurrency (ms)</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
                 <XAxis
                   dataKey="concurrency"
-                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
-                  axisLine={{ stroke: 'var(--color-border)' }}
+                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
+                  axisLine={{ stroke: 'var(--border)' }}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
-                  axisLine={{ stroke: 'var(--color-border)' }}
+                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
+                  axisLine={{ stroke: 'var(--border)' }}
                   tickLine={false}
                 />
-                <Tooltip contentStyle={tooltipStyle} />
+                <Tooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} />
                 <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }} />
-                {results.map((r, i) => (
-                  <Line
-                    key={r.endpoint.id}
-                    type="monotone"
-                    dataKey={`${r.endpoint.name}_ttft`}
-                    name={r.endpoint.name}
-                    stroke={COLORS[i % COLORS.length]}
-                    strokeWidth={2}
-                    dot={{ r: 3, strokeWidth: 0, fill: COLORS[i % COLORS.length] }}
-                    activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--color-background)', fill: COLORS[i % COLORS.length] }}
-                  />
-                ))}
+                {results.map((r, i) => {
+                  const keyName = `${r.endpoint.name} (${r.endpoint.modelId})`
+                  return (
+                    <Line
+                      key={r.endpoint.id}
+                      type="monotone"
+                      dataKey={`${keyName}_ttft`}
+                      name={keyName}
+                      stroke={ECHARTS_COLORS[i % ECHARTS_COLORS.length]}
+                      strokeWidth={2}
+                      dot={{ r: 3, strokeWidth: 0, fill: ECHARTS_COLORS[i % ECHARTS_COLORS.length] }}
+                      activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--background)', fill: ECHARTS_COLORS[i % ECHARTS_COLORS.length] }}
+                    />
+                  )
+                })}
               </LineChart>
             </ResponsiveContainer>
           </div>

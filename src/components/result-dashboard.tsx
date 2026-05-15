@@ -7,8 +7,12 @@ import { ChartTTFT } from '@/components/chart-ttft'
 import { ChartTPS } from '@/components/chart-tps'
 import { ChartITL } from '@/components/chart-itl'
 import { ChartThroughput } from '@/components/chart-throughput'
-import { Download, Save } from 'lucide-react'
+import { ChartPercentile } from '@/components/chart-percentile'
+import { Download, Save, FileSpreadsheet, FileText } from 'lucide-react'
 import { saveSession, exportSession } from '@/lib/store'
+import { exportCSV } from '@/lib/export-csv'
+import { generateMarkdownReport } from '@/lib/report'
+import { RawDataTable } from '@/components/raw-data-table'
 
 interface ResultDashboardProps {
   session: BenchmarkSession
@@ -32,6 +36,28 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
     onSaved?.()
   }
 
+  const handleExportCSV = () => {
+    const csv = exportCSV(session)
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `benchmark-${new Date(session.timestamp).toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleExportMarkdown = () => {
+    const md = generateMarkdownReport(session)
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `benchmark-${new Date(session.timestamp).toISOString().slice(0, 10)}.md`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const bestTps = Math.max(...session.results.map(r => r.singleConcurrency.tps.median))
   const bestTtft = Math.min(...session.results.map(r => r.singleConcurrency.ttft.median))
   const avgSuccess = session.results.reduce((sum, r) => sum + r.singleConcurrency.successRate, 0) / session.results.length
@@ -47,12 +73,18 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
               {session.results.length} endpoints / {session.config.repeatCount}x repeats / concurrency {session.config.concurrencyLevels.join(', ')}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button variant="outline" size="sm" onClick={handleSave}>
               <Save className="h-3.5 w-3.5 mr-1.5" /> Save
             </Button>
             <Button variant="outline" size="sm" onClick={handleExport}>
-              <Download className="h-3.5 w-3.5 mr-1.5" /> Export
+              <Download className="h-3.5 w-3.5 mr-1.5" /> JSON
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+              <FileSpreadsheet className="h-3.5 w-3.5 mr-1.5" /> CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportMarkdown}>
+              <FileText className="h-3.5 w-3.5 mr-1.5" /> Report
             </Button>
           </div>
         </div>
@@ -94,40 +126,11 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
       </div>
 
       <ChartITL results={session.results} />
+      <ChartPercentile results={session.results} />
       <ChartThroughput results={session.results} />
 
-      {/* 原始数据表 */}
-      <div className="rounded-lg border border-border bg-card overflow-hidden">
-        <div className="px-5 py-3 border-b border-border">
-          <h3 className="text-sm font-semibold">Raw Data</h3>
-        </div>
-        <div className="p-4 overflow-x-auto">
-          <table className="data-table w-full min-w-[640px] text-sm font-mono">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">Endpoint</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">TTFT (ms)</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">TPS</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">ITL P95 (ms)</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">E2E (ms)</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">Success</th>
-              </tr>
-            </thead>
-            <tbody>
-              {session.results.map(r => (
-                <tr key={r.endpoint.id} className="border-b border-border/50 last:border-0">
-                  <td className="px-3 py-3 font-medium text-foreground">{r.endpoint.name}</td>
-                  <td className="px-3 py-3 text-right tabular-nums">{r.singleConcurrency.ttft.median.toFixed(0)}</td>
-                  <td className="px-3 py-3 text-right tabular-nums text-primary">{r.singleConcurrency.tps.median.toFixed(1)}</td>
-                  <td className="px-3 py-3 text-right tabular-nums">{r.singleConcurrency.itl.p95.toFixed(1)}</td>
-                  <td className="px-3 py-3 text-right tabular-nums">{r.singleConcurrency.e2eLatency.median.toFixed(0)}</td>
-                  <td className="px-3 py-3 text-right font-medium tabular-nums">{r.singleConcurrency.successRate.toFixed(0)}%</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* 原始数据表 -- 动态颜色高亮 */}
+      <RawDataTable results={session.results} />
     </div>
   )
 }

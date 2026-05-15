@@ -8,7 +8,7 @@ import {
   BenchmarkSession,
 } from './types'
 import { runSingleBenchmark } from './runner'
-import { aggregateMetrics, computeSingleMetrics } from './metrics'
+import { aggregateMetrics, computeSingleMetrics, computeStreamingDetails } from './metrics'
 import { computeRadarScore } from './scoring'
 
 export class BenchmarkOrchestrator {
@@ -91,6 +91,7 @@ export class BenchmarkOrchestrator {
       || aggregateMetrics(allRawResults.filter(r => r.status === 'success').slice(0, config.repeatCount))
 
     const score = computeRadarScore(singleConcurrency, concurrencyResults)
+    const streamingDetails = computeStreamingDetails(allRawResults)
 
     return {
       endpoint,
@@ -98,6 +99,7 @@ export class BenchmarkOrchestrator {
       concurrencyResults,
       rawResults: allRawResults,
       score,
+      streamingDetails,
     }
   }
 

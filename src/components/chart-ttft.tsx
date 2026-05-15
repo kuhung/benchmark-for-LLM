@@ -5,28 +5,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ErrorBar,
+  Legend,
   ResponsiveContainer,
 } from 'recharts'
 
-const COLORS = ['#a3e635', '#38bdf8', '#f472b6', '#fb923c', '#a78bfa']
+const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 
 interface ChartTTFTProps {
   results: EndpointResult[]
 }
 
 export function ChartTTFT({ results }: ChartTTFTProps) {
-  const data = results.map((r, i) => ({
-    name: r.endpoint.name,
-    median: Number(r.singleConcurrency.ttft.median.toFixed(1)),
+  const data = results.map((r) => ({
+    name: `${r.endpoint.name} (${r.endpoint.modelId})`,
+    p50: Number(r.singleConcurrency.ttft.median.toFixed(1)),
     p95: Number(r.singleConcurrency.ttft.p95.toFixed(1)),
-    errorMargin: Number((r.singleConcurrency.ttft.p95 - r.singleConcurrency.ttft.median).toFixed(1)),
-    fill: COLORS[i % COLORS.length],
+    max: Number(r.singleConcurrency.ttft.max.toFixed(1)),
   }))
 
   return (
@@ -35,35 +33,34 @@ export function ChartTTFT({ results }: ChartTTFTProps) {
         <CardTitle>TTFT (ms)</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={data} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={data} margin={{ top: 10, right: 12, bottom: 20, left: 6 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
-              axisLine={{ stroke: 'var(--color-border)' }}
+              tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
+              axisLine={{ stroke: 'var(--border)' }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--color-muted-foreground)' }}
-              axisLine={{ stroke: 'var(--color-border)' }}
+              tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
+              axisLine={{ stroke: 'var(--border)' }}
               tickLine={false}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'var(--color-card)',
-                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '6px',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '12px',
               }}
+              labelStyle={{ color: 'var(--foreground)', marginBottom: '4px' }}
             />
-            <Bar dataKey="median" name="P50" radius={[3, 3, 0, 0]}>
-              {data.map(entry => (
-                <Cell key={entry.name} fill={entry.fill} fillOpacity={0.8} />
-              ))}
-              <ErrorBar dataKey="errorMargin" width={6} strokeWidth={1.5} stroke="var(--color-foreground)" strokeOpacity={0.3} />
-            </Bar>
+            <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }} />
+            <Bar dataKey="p50" name="P50" fill={ECHARTS_COLORS[0]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="p95" name="P95" fill={ECHARTS_COLORS[1]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="max" name="Max (Cold Start)" fill={ECHARTS_COLORS[3]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

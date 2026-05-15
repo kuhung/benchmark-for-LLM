@@ -12,8 +12,15 @@ export interface RawResult {
   requestEnd: number
   tokenTimestamps: number[]
   outputTokenCount: number
+  chunkSizes?: number[]
   status: 'success' | 'error' | 'timeout'
   error?: string
+}
+
+export interface StreamingDetails {
+  chunkCount: number
+  avgCharsPerChunk: number
+  avgChunkInterval: number
 }
 
 export interface SingleMetrics {
@@ -35,6 +42,8 @@ export interface AggregatedMetrics {
 export interface StatsSummary {
   mean: number
   median: number
+  p75?: number
+  p90?: number
   p95: number
   p99: number
   min: number
@@ -55,6 +64,7 @@ export interface EndpointResult {
   concurrencyResults: ConcurrencyResult[]
   rawResults: RawResult[]
   score?: RadarScore
+  streamingDetails?: StreamingDetails
 }
 
 export interface RadarScore {

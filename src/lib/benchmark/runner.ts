@@ -11,6 +11,7 @@ export async function runSingleBenchmark(
   onToken?: (timestamp: number) => void
 ): Promise<RawResult> {
   const tokenTimestamps: number[] = []
+  const chunkSizes: number[] = []
   const requestStart = performance.now()
 
   try {
@@ -56,9 +57,10 @@ export async function runSingleBenchmark(
     }
 
     const reader = response.body!.getReader()
-    for await (const _token of parseSSEStream(reader)) {
+    for await (const chunk of parseSSEStream(reader)) {
       const ts = performance.now()
       tokenTimestamps.push(ts)
+      chunkSizes.push(chunk.length)
       onToken?.(ts)
     }
 
@@ -68,6 +70,7 @@ export async function runSingleBenchmark(
       requestEnd: performance.now(),
       tokenTimestamps,
       outputTokenCount: tokenTimestamps.length,
+      chunkSizes,
       status: 'success',
     }
   } catch (err) {

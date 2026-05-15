@@ -4,16 +4,37 @@ import { useEffect, useState } from 'react'
 import { BenchmarkSession } from '@/lib/benchmark/types'
 import { getAllSessions, deleteSession, exportSession, importSession } from '@/lib/store'
 import { Button } from '@/components/ui/button'
-import { Trash2, Download, Upload, Eye } from 'lucide-react'
+import { Trash2, Download, Upload, Eye, GitCompare } from 'lucide-react'
 
 interface HistoryListProps {
   onView: (session: BenchmarkSession) => void
+  onCompare?: (sessions: BenchmarkSession[]) => void
   refreshTrigger?: number
 }
 
-export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
+export function HistoryList({ onView, onCompare, refreshTrigger }: HistoryListProps) {
   const [sessions, setSessions] = useState<BenchmarkSession[]>([])
   const [importError, setImportError] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else if (next.size < 4) {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
+  const handleCompare = () => {
+    const selected = sessions.filter(s => selectedIds.has(s.id))
+    if (selected.length >= 2) {
+      onCompare?.(selected)
+    }
+  }
 
   useEffect(() => {
     loadSessions()
@@ -63,9 +84,16 @@ export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3 border-b border-border">
         <h2 className="text-sm font-semibold">History</h2>
-        <Button variant="outline" size="sm" onClick={handleImport}>
-          <Upload className="h-3.5 w-3.5 mr-1.5" /> Import
-        </Button>
+        <div className="flex gap-2">
+          {selectedIds.size >= 2 && onCompare && (
+            <Button variant="outline" size="sm" onClick={handleCompare}>
+              <GitCompare className="h-3.5 w-3.5 mr-1.5" /> Compare ({selectedIds.size})
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={handleImport}>
+            <Upload className="h-3.5 w-3.5 mr-1.5" /> Import
+          </Button>
+        </div>
       </div>
 
       <div className="p-4">
@@ -82,32 +110,57 @@ export function HistoryList({ onView, refreshTrigger }: HistoryListProps) {
           </div>
         ) : (
           <div className="space-y-2">
-            {sessions.map((session) => (
-              <div
-                key={session.id}
-                className="flex flex-col gap-3 rounded-md border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between hover:border-primary/30 transition-colors"
-              >
-                <div>
-                  <p className="text-sm font-medium font-mono tabular-nums">
-                    {new Date(session.timestamp).toLocaleString('zh-CN')}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {session.results.length} endpoints / {session.config.repeatCount}x / concurrency {session.config.concurrencyLevels.join(', ')}
-                  </p>
+            {onCompare && sessions.length >= 2 && (
+              <p className="text-xs text-muted-foreground mb-2">
+                Select 2-4 sessions to compare
+              </p>
+            )}
+            {sessions.map((session) => {
+              const isSelected = selectedIds.has(session.id)
+              return (
+                <div
+                  key={session.id}
+                  className={`flex flex-col gap-3 rounded-md border bg-background p-4 sm:flex-row sm:items-center sm:justify-between transition-colors ${
+                    isSelected
+                      ? 'border-primary/50 bg-primary/5'
+                      : 'border-border hover:border-primary/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {onCompare && (
+                      <button
+                        onClick={() => toggleSelect(session.id)}
+                        className={`h-4 w-4 shrink-0 rounded border transition-colors ${
+                          isSelected
+                            ? 'bg-primary border-primary'
+                            : 'border-muted-foreground/40 hover:border-primary'
+                        }`}
+                        aria-label={isSelected ? 'Deselect' : 'Select'}
+                      />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium font-mono tabular-nums">
+                        {new Date(session.timestamp).toLocaleString('zh-CN')}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {session.results.length} endpoints / {session.config.repeatCount}x / concurrency {session.config.concurrencyLevels.join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5 shrink-0">
+                    <Button variant="outline" size="sm" onClick={() => onView(session)}>
+                      <Eye className="h-3.5 w-3.5 mr-1" /> View
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExport(session)} title="Export">
+                      <Download className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive" onClick={() => handleDelete(session.id)} title="Delete">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-1.5 shrink-0">
-                  <Button variant="outline" size="sm" onClick={() => onView(session)}>
-                    <Eye className="h-3.5 w-3.5 mr-1" /> View
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExport(session)} title="Export">
-                    <Download className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive" onClick={() => handleDelete(session.id)} title="Delete">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

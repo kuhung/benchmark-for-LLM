@@ -1,22 +1,56 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0c0c10;
-  --color-foreground: #e4e4e8;
-  --color-muted: #16161c;
-  --color-muted-foreground: #7c7c8a;
-  --color-border: #24242e;
-  --color-primary: #a3e635;
-  --color-primary-foreground: #0c0c10;
-  --color-destructive: #ef4444;
-  --color-accent: #1c1c26;
-  --color-card: #101014;
-  --color-card-foreground: #e4e4e8;
-  --color-popover: #101014;
-  --color-ring: #a3e63540;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-accent: var(--accent);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-ring: var(--ring);
   --font-sans: var(--font-chakra), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), monospace;
   --radius: 6px;
+}
+
+@layer base {
+  :root {
+    --background: #fdfdfd;
+    --foreground: #101014;
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+    --border: #e4e4e7;
+    --primary: #10b981;
+    --primary-foreground: #ffffff;
+    --destructive: #ef4444;
+    --accent: #f4f4f5;
+    --card: #ffffff;
+    --card-foreground: #101014;
+    --popover: #ffffff;
+    --ring: #10b98140;
+  }
+
+  .dark {
+    --background: #0c0c10;
+    --foreground: #e4e4e8;
+    --muted: #16161c;
+    --muted-foreground: #7c7c8a;
+    --border: #24242e;
+    --primary: #a3e635;
+    --primary-foreground: #0c0c10;
+    --destructive: #ef4444;
+    --accent: #1c1c26;
+    --card: #101014;
+    --card-foreground: #e4e4e8;
+    --popover: #101014;
+    --ring: #a3e63540;
+  }
 }
 
 @keyframes fade-in {
