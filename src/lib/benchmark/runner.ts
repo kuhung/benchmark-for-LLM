@@ -44,6 +44,8 @@ export async function runSingleBenchmark(
     clearTimeout(timeoutId)
 
     if (!response.ok) {
+      let errorBody = ''
+      try { errorBody = await response.text() } catch { /* ignore */ }
       const requestEnd = performance.now()
       return {
         endpointId: endpoint.id,
@@ -52,16 +54,27 @@ export async function runSingleBenchmark(
         tokenTimestamps: [],
         outputTokenCount: 0,
         status: 'error',
-        error: `HTTP ${response.status}: ${response.statusText}`,
+        error: `HTTP ${response.status}: ${response.statusText}${errorBody ? ` - ${errorBody.slice(0, 200)}` : ''}`,
       }
     }
 
-    const reader = response.body!.getReader()
-    for await (const chunk of parseSSEStream(reader)) {
-      const ts = performance.now()
-      tokenTimestamps.push(ts)
-      chunkSizes.push(chunk.length)
-      onToken?.(ts)
+    const contentType = response.headers.get('content-type') || ''
+
+    if (response.body) {
+      const reader = response.body.getReader()
+      for await (const chunk of parseSSEStream(reader)) {
+        const ts = performance.now()
+        tokenTimestamps.push(ts)
+        chunkSizes.push(chunk.length)
+        onToken?.(ts)
+      }
+    }
+
+    if (tokenTimestamps.length === 0) {
+      console.warn(
+        `[benchmark-runner] No tokens parsed from ${endpoint.baseUrl}. ` +
+        `Content-Type: ${contentType}. Response body was ${response.body ? 'present' : 'null'}.`
+      )
     }
 
     return {

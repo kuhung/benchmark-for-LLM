@@ -29,7 +29,7 @@ export function aggregateMetrics(rawResults: RawResult[]): AggregatedMetrics {
       tps: emptyStats(),
       itl: emptyStats(),
       e2eLatency: emptyStats(),
-      successRate: 0,
+      successRate: rawResults.length > 0 ? (successful.length / rawResults.length) * 100 : 0,
       totalRequests: rawResults.length,
     }
   }

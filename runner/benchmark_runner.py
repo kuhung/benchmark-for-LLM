@@ -95,6 +95,22 @@ def compute_stats(values: list[float]) -> StatsSummary:
     )
 
 
+def _extract_content(chunk: dict) -> str | None:
+    choices = chunk.get("choices", [])
+    if not choices:
+        return None
+    first = choices[0]
+    delta = first.get("delta", {}) if isinstance(first, dict) else {}
+    message = first.get("message", {}) if isinstance(first, dict) else {}
+    return (
+        delta.get("content")
+        or message.get("content")
+        or delta.get("text")
+        or message.get("text")
+        or (first.get("text") if isinstance(first, dict) else None)
+    ) or None
+
+
 async def run_single_benchmark(
     client: httpx.AsyncClient,
     endpoint: Endpoint,
@@ -130,20 +146,27 @@ async def run_single_benchmark(
                     error=f"HTTP {response.status_code}",
                 )
             async for line in response.aiter_lines():
-                if not line.startswith("data:"):
+                stripped = line.strip()
+                if not stripped:
                     continue
-                data = line[6:] if line.startswith("data: ") else line[5:]
-                if data == "[DONE]":
-                    break
-                try:
-                    chunk = json.loads(data)
-                    delta = chunk.get("choices", [{}])[0].get("delta", {})
-                    message = chunk.get("choices", [{}])[0].get("message", {})
-                    content = delta.get("content") or message.get("content")
-                    if content:
-                        token_timestamps.append(time.perf_counter())
-                except json.JSONDecodeError:
+                if stripped.startswith("data:"):
+                    data = stripped[6:] if stripped.startswith("data: ") else stripped[5:]
+                    if data == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(data)
+                    except json.JSONDecodeError:
+                        continue
+                elif stripped.startswith("{"):
+                    try:
+                        chunk = json.loads(stripped)
+                    except json.JSONDecodeError:
+                        continue
+                else:
                     continue
+                content = _extract_content(chunk)
+                if content:
+                    token_timestamps.append(time.perf_counter())
     except Exception as e:
         return RawResult(
             endpoint_id=endpoint.id,
@@ -190,7 +213,8 @@ def aggregate_results(raw_results: list[RawResult]) -> dict:
         empty = stats_to_web_dict(StatsSummary())
         return {
             "ttft": empty, "tps": empty, "itl": empty, "e2eLatency": empty,
-            "successRate": 0, "totalRequests": len(raw_results),
+            "successRate": (len(successful) / len(raw_results)) * 100 if raw_results else 0,
+            "totalRequests": len(raw_results),
         }
 
     all_itl = [v for m in metrics_list for v in m["itl"]]
