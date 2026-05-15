@@ -14,13 +14,13 @@ export async function* parseSSEStream(
 
     for (const line of lines) {
       const trimmed = line.trim()
-      if (!trimmed || !trimmed.startsWith('data: ')) continue
-      const data = trimmed.slice(6)
+      if (!trimmed || !trimmed.startsWith('data:')) continue
+      const data = trimmed.startsWith('data: ') ? trimmed.slice(6) : trimmed.slice(5)
       if (data === '[DONE]') return
 
       try {
         const parsed = JSON.parse(data)
-        const content = parsed.choices?.[0]?.delta?.content
+        const content = parsed.choices?.[0]?.delta?.content ?? parsed.choices?.[0]?.message?.content
         if (content) {
           yield content
         }
@@ -32,13 +32,16 @@ export async function* parseSSEStream(
 
   if (buffer.trim()) {
     const trimmed = buffer.trim()
-    if (trimmed.startsWith('data: ') && trimmed.slice(6) !== '[DONE]') {
-      try {
-        const parsed = JSON.parse(trimmed.slice(6))
-        const content = parsed.choices?.[0]?.delta?.content
-        if (content) yield content
-      } catch {
-        // skip
+    if (trimmed.startsWith('data:')) {
+      const data = trimmed.startsWith('data: ') ? trimmed.slice(6) : trimmed.slice(5)
+      if (data !== '[DONE]') {
+        try {
+          const parsed = JSON.parse(data)
+          const content = parsed.choices?.[0]?.delta?.content ?? parsed.choices?.[0]?.message?.content
+          if (content) yield content
+        } catch {
+          // skip
+        }
       }
     }
   }

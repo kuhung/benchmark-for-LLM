@@ -130,14 +130,16 @@ async def run_single_benchmark(
                     error=f"HTTP {response.status_code}",
                 )
             async for line in response.aiter_lines():
-                if not line.startswith("data: "):
+                if not line.startswith("data:"):
                     continue
-                data = line[6:]
+                data = line[6:] if line.startswith("data: ") else line[5:]
                 if data == "[DONE]":
                     break
                 try:
                     chunk = json.loads(data)
-                    content = chunk.get("choices", [{}])[0].get("delta", {}).get("content")
+                    delta = chunk.get("choices", [{}])[0].get("delta", {})
+                    message = chunk.get("choices", [{}])[0].get("message", {})
+                    content = delta.get("content") or message.get("content")
                     if content:
                         token_timestamps.append(time.perf_counter())
                 except json.JSONDecodeError:
