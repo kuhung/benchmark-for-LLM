@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Trash2, Wifi, WifiOff, Loader2, ChevronDown, Search, Check } from 'lucide-react'
 
-const PRESETS = [
-  { label: 'Ollama', baseUrl: 'http://localhost:11434', modelId: 'llama3.2' },
+export const PRESETS = [
+  { label: 'Ollama', baseUrl: 'http://localhost:11434', modelId: 'default' },
   { label: 'LM Studio', baseUrl: 'http://localhost:1234', modelId: 'default' },
-  { label: 'MLX', baseUrl: 'http://localhost:8080', modelId: 'default' },
+  { label: 'oMLX', baseUrl: 'http://localhost:8000', modelId: 'default' },
+  { label: 'OpenAI', baseUrl: 'https://api.openai.com', modelId: 'default' },
+  { label: 'Anthropic', baseUrl: 'https://api.anthropic.com', modelId: 'default' },
 ]
 
 interface EndpointConfigProps {

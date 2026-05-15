@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Endpoint, BenchmarkConfig, BenchmarkProgress, BenchmarkSession } from '@/lib/benchmark/types'
 import { BenchmarkOrchestrator } from '@/lib/benchmark/orchestrator'
+import { fetchModels } from '@/lib/benchmark/runner'
 import { DEFAULT_PROMPT } from '@/lib/prompts'
-import { EndpointConfig } from '@/components/endpoint-config'
+import { EndpointConfig, PRESETS } from '@/components/endpoint-config'
 import { BenchmarkSettings } from '@/components/benchmark-settings'
 import { RunProgress } from '@/components/run-progress'
 import { ResultDashboard } from '@/components/result-dashboard'
@@ -12,13 +13,12 @@ import { HistoryList } from '@/components/history-list'
 import { CompareView } from '@/components/compare-view'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
-import { Play, RotateCcw, Clock, Gauge } from 'lucide-react'
+import { Play, RotateCcw, Clock, Gauge, Loader2 } from 'lucide-react'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'new' | 'history'>('new')
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([
-    { id: crypto.randomUUID(), name: 'Ollama', baseUrl: 'http://localhost:11434', modelId: 'llama3.2' },
-  ])
+  const [endpoints, setEndpoints] = useState<Endpoint[]>([])
+  const [isDiscovering, setIsDiscovering] = useState(true)
   const [config, setConfig] = useState<BenchmarkConfig>({
     prompt: DEFAULT_PROMPT,
     maxTokens: 256,
@@ -30,6 +30,44 @@ export default function Home() {
   const [orchestrator, setOrchestrator] = useState<BenchmarkOrchestrator | null>(null)
   const [historyRefresh, setHistoryRefresh] = useState(0)
   const [compareSessions, setCompareSessions] = useState<BenchmarkSession[] | null>(null)
+
+  useEffect(() => {
+    async function discover() {
+      // Send requests in parallel to find the first active preset
+      const promises = PRESETS.map(async (preset) => {
+        try {
+          const res = await fetchModels(preset.baseUrl)
+          if (res.ok && res.models.length > 0) {
+            return { preset, models: res.models }
+          }
+        } catch {
+          // ignore
+        }
+        return null
+      })
+      
+      const results = await Promise.all(promises)
+      const firstActive = results.find(r => r !== null)
+      
+      if (firstActive) {
+        let modelId = firstActive.preset.modelId
+        if (modelId === 'default' || !firstActive.models.includes(modelId)) {
+          modelId = firstActive.models[0]
+        }
+        setEndpoints([{
+          id: crypto.randomUUID(),
+          name: firstActive.preset.label,
+          baseUrl: firstActive.preset.baseUrl,
+          modelId: modelId
+        }])
+      } else {
+        // 如果都没连接上，就清空，让用户自己加或者配置
+        setEndpoints([])
+      }
+      setIsDiscovering(false)
+    }
+    discover()
+  }, [])
 
   const startBenchmark = useCallback(async () => {
     if (endpoints.length === 0) return
@@ -103,7 +141,14 @@ export default function Home() {
               <div className="space-y-6 animate-fade-in">
                 {/* Step 1: 端点配置 -- 用户首先需要知道测什么 */}
                 <section>
-                  <EndpointConfig endpoints={endpoints} onChange={setEndpoints} />
+                  {isDiscovering ? (
+                    <div className="rounded-lg border border-border bg-card p-12 flex flex-col items-center justify-center space-y-3">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      <p className="text-sm text-muted-foreground">正在自动发现可用的 API 端点与模型...</p>
+                    </div>
+                  ) : (
+                    <EndpointConfig endpoints={endpoints} onChange={setEndpoints} />
+                  )}
                 </section>
 
                 {/* Step 2: 测试参数 */}
