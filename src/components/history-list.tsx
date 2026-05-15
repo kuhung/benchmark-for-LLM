@@ -3,9 +3,37 @@
 import { useEffect, useState } from 'react'
 import { BenchmarkSession } from '@/lib/benchmark/types'
 import { getAllSessions, deleteSession, exportSession, importSession } from '@/lib/store'
+import { PROMPT_PRESETS } from '@/lib/prompts'
 import { Button } from '@/components/ui/button'
 import { Trash2, Download, Upload, Eye, GitCompare } from 'lucide-react'
 import { useI18n } from '@/lib/i18n'
+
+function getPromptLabel(session: BenchmarkSession, lang: 'en' | 'zh'): string {
+  if (session.config.promptId) {
+    const preset = PROMPT_PRESETS.find(p => p.id === session.config.promptId)
+    if (preset) return preset.label[lang]
+  }
+  const promptStr = typeof session.config.prompt === 'string'
+    ? session.config.prompt
+    : session.config.prompt[lang] || session.config.prompt.en
+  for (const preset of PROMPT_PRESETS) {
+    if (preset.content.en === promptStr || preset.content.zh === promptStr ||
+        (typeof session.config.prompt !== 'string' &&
+         preset.content.en === session.config.prompt.en &&
+         preset.content.zh === session.config.prompt.zh)) {
+      return preset.label[lang]
+    }
+  }
+  return lang === 'zh' ? '自定义' : 'Custom'
+}
+
+function getModelsSummary(session: BenchmarkSession): string[] {
+  return session.results.map(r => {
+    const framework = r.endpoint.name
+    const model = r.endpoint.modelId
+    return framework === model ? model : `${framework} / ${model}`
+  })
+}
 
 interface HistoryListProps {
   onView: (session: BenchmarkSession) => void
@@ -119,20 +147,23 @@ export function HistoryList({ onView, onCompare, refreshTrigger }: HistoryListPr
             )}
             {sessions.map((session) => {
               const isSelected = selectedIds.has(session.id)
+              const models = getModelsSummary(session)
+              const promptLabel = getPromptLabel(session, lang)
+              const bestScore = Math.max(...session.results.map(r => r.score?.overall ?? 0))
               return (
                 <div
                   key={session.id}
-                  className={`flex flex-col gap-3 rounded-md border bg-background p-4 sm:flex-row sm:items-center sm:justify-between transition-colors ${
+                  className={`rounded-md border bg-background p-4 transition-colors ${
                     isSelected
                       ? 'border-primary/50 bg-primary/5'
                       : 'border-border hover:border-primary/30'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-start gap-3">
                     {onCompare && (
                       <button
                         onClick={() => toggleSelect(session.id)}
-                        className={`h-4 w-4 shrink-0 rounded border transition-colors ${
+                        className={`mt-1 h-4 w-4 shrink-0 rounded border transition-colors ${
                           isSelected
                             ? 'bg-primary border-primary'
                             : 'border-muted-foreground/40 hover:border-primary'
@@ -140,25 +171,45 @@ export function HistoryList({ onView, onCompare, refreshTrigger }: HistoryListPr
                         aria-label={isSelected ? t('deselect') : t('select')}
                       />
                     )}
-                    <div>
-                      <p className="text-sm font-medium font-mono tabular-nums">
-                        {new Date(session.timestamp).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US')}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {session.results.length} {t('endpointCount')} / {session.config.repeatCount} {t('repeats')} / {t('concurrency')} {session.config.concurrencyLevels.join(', ')}
-                      </p>
+                    <div className="flex-1 min-w-0">
+                      {/* Primary: model names - most important info */}
+                      <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                        {models.map((m, i) => (
+                          <span key={i} className="inline-flex items-center rounded bg-primary/10 text-primary px-2 py-0.5 text-xs font-medium font-mono truncate max-w-[240px]">
+                            {m}
+                          </span>
+                        ))}
+                        {bestScore > 0 && (
+                          <span className="inline-flex items-center rounded bg-muted px-2 py-0.5 text-xs font-mono font-semibold tabular-nums text-foreground">
+                            {t('score')}: {bestScore}
+                          </span>
+                        )}
+                      </div>
+                      {/* Secondary: prompt scenario + test params */}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        <span>
+                          {t('promptLabel')}: <span className="text-foreground font-medium">{promptLabel}</span>
+                        </span>
+                        <span>{session.config.repeatCount}x {t('repeats')}</span>
+                        <span>{t('concurrency')} {session.config.concurrencyLevels.join(',')}</span>
+                        <span className="tabular-nums">
+                          {new Date(session.timestamp).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US', {
+                            month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-1.5 shrink-0">
-                    <Button variant="outline" size="sm" onClick={() => onView(session)}>
-                      <Eye className="h-3.5 w-3.5 mr-1" /> {t('view')}
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExport(session)} title={t('export')}>
-                      <Download className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive" onClick={() => handleDelete(session.id)} title={t('delete')}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+                    <div className="flex gap-1.5 shrink-0">
+                      <Button variant="outline" size="sm" onClick={() => onView(session)}>
+                        <Eye className="h-3.5 w-3.5 mr-1" /> {t('view')}
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExport(session)} title={t('export')}>
+                        <Download className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive" onClick={() => handleDelete(session.id)} title={t('delete')}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )

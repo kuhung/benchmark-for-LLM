@@ -115,12 +115,28 @@ export const translations = {
   legendMaxColdStart: { en: 'Max (Cold Start)', zh: '最大值 (冷启动)' },
   legendTpsP50: { en: 'TPS (P50)', zh: 'TPS (P50)' },
   
-  // Radar dimensions
-  radarSpeed: { en: 'Speed', zh: '速度 (Speed)' },
-  radarResponse: { en: 'Response', zh: '响应 (Response)' },
-  radarSmooth: { en: 'Smooth', zh: '平滑 (Smooth)' },
-  radarScale: { en: 'Scale', zh: '并发 (Scale)' },
-  radarStable: { en: 'Consistency', zh: '一致性 (Consistency)' },
+  // Radar dimensions — label is concise, desc explains "higher = better"
+  radarSpeed: { en: 'Output Speed', zh: '输出速度' },
+  radarSpeedDesc: { en: 'Token generation rate (TPS). Higher = faster output', zh: '生成速率 (TPS)，越高=输出越快' },
+  radarResponse: { en: 'First Token', zh: '首字响应' },
+  radarResponseDesc: { en: 'Time to first token (TTFT). Higher = responds faster', zh: '首字延迟 (TTFT)，越高=响应越快' },
+  radarSmooth: { en: 'Smoothness', zh: '输出平滑' },
+  radarSmoothDesc: { en: 'Token output smoothness (ITL). Higher = more even streaming', zh: '字间延迟稳定度 (ITL)，越高=流式输出越均匀' },
+  radarScale: { en: 'Scalability', zh: '并发能力' },
+  radarScaleDesc: { en: 'Performance under concurrency. Higher = scales better', zh: '并发下性能保持，越高=扩展性越强' },
+  radarStable: { en: 'Stability', zh: '响应稳定' },
+  radarStableDesc: { en: 'Response latency consistency. Higher = more predictable', zh: '延迟一致性和成功率，越高=表现越稳定' },
+  radarHigherIsBetter: { en: 'All dimensions: higher (outward) = better', zh: '所有维度：越靠外=表现越好' },
+
+  // History / session info
+  promptLabel: { en: 'Prompt', zh: '提示词' },
+  customPrompt: { en: 'Custom', zh: '自定义' },
+  model: { en: 'Model', zh: '模型' },
+  framework: { en: 'Framework', zh: '框架' },
+  testConfig: { en: 'Test Configuration', zh: '测试配置' },
+  promptScene: { en: 'Scenario', zh: '测试场景' },
+  testedModels: { en: 'Tested Models', zh: '测试模型' },
+  score: { en: 'Score', zh: '得分' },
 }
 
 export type TranslationKey = keyof typeof translations

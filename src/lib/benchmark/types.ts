@@ -83,6 +83,7 @@ export interface RadarScore {
 
 export interface BenchmarkConfig {
   prompt: LocalizedString | string
+  promptId?: string
   maxTokens: number
   repeatCount: number
   concurrencyLevels: number[]

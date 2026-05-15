@@ -21,13 +21,15 @@ interface CompareViewProps {
 }
 
 function sessionLabel(session: BenchmarkSession, lang: string): string {
+  const models = session.results.map(r => r.endpoint.modelId).join(', ')
   const locale = lang === 'zh' ? 'zh-CN' : 'en-US'
-  return new Date(session.timestamp).toLocaleString(locale, {
+  const time = new Date(session.timestamp).toLocaleString(locale, {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
   })
+  return `${models} (${time})`
 }
 
 function flattenResults(sessions: BenchmarkSession[], lang: string): { label: string; result: EndpointResult; sessionIdx: number }[] {
@@ -125,7 +127,10 @@ export function CompareView({ sessions }: CompareViewProps) {
                     />
                     <span className="text-xs text-muted-foreground">{sessionLabel(sessions[sessionIdx], lang)}</span>
                   </td>
-                  <td className="px-3 py-3 font-medium">{result.endpoint.name}</td>
+                  <td className="px-3 py-3">
+                    <span className="font-medium">{result.endpoint.name}</span>
+                    <span className="text-xs text-muted-foreground ml-1.5">{result.endpoint.modelId}</span>
+                  </td>
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.ttft.median.toFixed(0)}</td>
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.tps.median.toFixed(1)}</td>
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.itl.p95.toFixed(1)}</td>

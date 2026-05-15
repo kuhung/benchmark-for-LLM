@@ -25,6 +25,7 @@ export default function Home() {
   const [isDiscovering, setIsDiscovering] = useState(true)
   const [config, setConfig] = useState<BenchmarkConfig>({
     prompt: { ...DEFAULT_PROMPT },
+    promptId: 'medium',
     maxTokens: 256,
     repeatCount: 5,
     concurrencyLevels: [1, 2, 4, 8],
@@ -122,7 +123,10 @@ export default function Home() {
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
-                onClick={() => setActiveTab('new')}
+                onClick={() => {
+                  setActiveTab('new')
+                  setSession(null)
+                }}
               >
                 {t('newTest')}
               </button>

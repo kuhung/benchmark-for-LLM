@@ -1,4 +1,5 @@
 import { BenchmarkSession, StatsSummary } from './benchmark/types'
+import { PROMPT_PRESETS } from './prompts'
 
 export function generateMarkdownReport(session: BenchmarkSession): string {
   const date = new Date(session.timestamp).toISOString().replace('T', ' ').slice(0, 19)
@@ -14,7 +15,12 @@ export function generateMarkdownReport(session: BenchmarkSession): string {
   lines.push(`- **Repeat Count**: ${session.config.repeatCount}`)
   lines.push(`- **Max Tokens**: ${session.config.maxTokens}`)
   lines.push(`- **Concurrency Levels**: ${session.config.concurrencyLevels.join(', ')}`)
+  const promptPreset = session.config.promptId
+    ? PROMPT_PRESETS.find(p => p.id === session.config.promptId)
+    : undefined
+  const promptLabel = promptPreset ? `${promptPreset.label.en} / ${promptPreset.label.zh}` : 'Custom'
   const promptStr = typeof session.config.prompt === 'string' ? session.config.prompt : (session.config.prompt.zh || session.config.prompt.en)
+  lines.push(`- **Prompt Scenario**: ${promptLabel}`)
   lines.push(`- **Prompt**: ${promptStr.length > 80 ? promptStr.slice(0, 80) + '...' : promptStr}`)
   lines.push('')
 

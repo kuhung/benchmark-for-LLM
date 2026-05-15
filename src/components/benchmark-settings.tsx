@@ -22,13 +22,15 @@ export function BenchmarkSettings({ config, onChange }: BenchmarkSettingsProps) 
         <label className="mb-1.5 block text-xs text-muted-foreground">{t('testPrompt')}</label>
         <div className="mb-2 flex flex-wrap gap-1.5">
           {PROMPT_PRESETS.map(preset => {
-            const isActive = typeof config.prompt !== 'string' && config.prompt.en === preset.content.en && config.prompt.zh === preset.content.zh
+            const isActive = config.promptId === preset.id || (
+              !config.promptId && typeof config.prompt !== 'string' && config.prompt.en === preset.content.en && config.prompt.zh === preset.content.zh
+            )
             return (
               <Button
                 key={preset.id}
                 variant={isActive ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => onChange({ ...config, prompt: { ...preset.content } })}
+                onClick={() => onChange({ ...config, prompt: { ...preset.content }, promptId: preset.id })}
                 className="h-7 px-2.5 text-xs"
                 title={preset.description[lang]}
               >
@@ -42,9 +44,11 @@ export function BenchmarkSettings({ config, onChange }: BenchmarkSettingsProps) 
           value={typeof config.prompt === 'string' ? config.prompt : config.prompt[lang]}
           onChange={e => {
             if (typeof config.prompt === 'string') {
-              onChange({ ...config, prompt: e.target.value })
+              onChange({ ...config, prompt: e.target.value, promptId: undefined })
             } else {
-              onChange({ ...config, prompt: { ...config.prompt, [lang]: e.target.value } })
+              const newPrompt = { ...config.prompt, [lang]: e.target.value }
+              const matchedPreset = PROMPT_PRESETS.find(p => p.content.en === newPrompt.en && p.content.zh === newPrompt.zh)
+              onChange({ ...config, prompt: newPrompt, promptId: matchedPreset?.id })
             }
           }}
           placeholder={t('enterPrompt')}

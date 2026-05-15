@@ -1,6 +1,7 @@
 'use client'
 
 import { BenchmarkSession } from '@/lib/benchmark/types'
+import { PROMPT_PRESETS } from '@/lib/prompts'
 import { Button } from '@/components/ui/button'
 import { ChartRadar } from '@/components/chart-radar'
 import { ChartTTFT } from '@/components/chart-ttft'
@@ -19,8 +20,27 @@ interface ResultDashboardProps {
   session: BenchmarkSession
 }
 
+function getPromptLabel(session: BenchmarkSession, lang: 'en' | 'zh'): string {
+  if (session.config.promptId) {
+    const preset = PROMPT_PRESETS.find(p => p.id === session.config.promptId)
+    if (preset) return preset.label[lang]
+  }
+  const promptStr = typeof session.config.prompt === 'string'
+    ? session.config.prompt
+    : session.config.prompt[lang] || session.config.prompt.en
+  for (const preset of PROMPT_PRESETS) {
+    if (preset.content.en === promptStr || preset.content.zh === promptStr ||
+        (typeof session.config.prompt !== 'string' &&
+         preset.content.en === session.config.prompt.en &&
+         preset.content.zh === session.config.prompt.zh)) {
+      return preset.label[lang]
+    }
+  }
+  return lang === 'zh' ? '自定义' : 'Custom'
+}
+
 export function ResultDashboard({ session }: ResultDashboardProps) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   const handleExport = async () => {
     const json = await exportSession(session)
@@ -66,8 +86,18 @@ export function ResultDashboard({ session }: ResultDashboardProps) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-5">
           <div>
             <h2 className="text-base font-semibold">{t('results')}</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {session.results.length} {t('endpointCount')} / {session.config.repeatCount} {t('repeats')} / {t('concurrency')} {session.config.concurrencyLevels.join(', ')}
+            <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+              {session.results.map((r, i) => (
+                <span key={i} className="inline-flex items-center rounded bg-primary/10 text-primary px-2 py-0.5 text-xs font-medium font-mono">
+                  {r.endpoint.name} / {r.endpoint.modelId}
+                </span>
+              ))}
+              <span className="inline-flex items-center rounded bg-muted px-2 py-0.5 text-xs font-mono">
+                {t('promptLabel')}: {getPromptLabel(session, lang)}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {session.config.repeatCount}x {t('repeats')} / {t('concurrency')} {session.config.concurrencyLevels.join(', ')} / Max {session.config.maxTokens} tokens
             </p>
           </div>
           <div className="flex gap-2 flex-wrap items-center">
