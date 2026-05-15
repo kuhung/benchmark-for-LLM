@@ -4,6 +4,7 @@ import { BenchmarkProgress } from '@/lib/benchmark/types'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Loader2, XCircle } from 'lucide-react'
+import { useI18n } from '@/lib/i18n'
 
 interface RunProgressProps {
   progress: BenchmarkProgress
@@ -11,6 +12,8 @@ interface RunProgressProps {
 }
 
 export function RunProgress({ progress, onCancel }: RunProgressProps) {
+  const { t } = useI18n()
+
   if (progress.status !== 'running') return null
 
   const percent = progress.totalTasks > 0
@@ -23,9 +26,9 @@ export function RunProgress({ progress, onCancel }: RunProgressProps) {
         <div className="flex items-center gap-3">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
           <div>
-            <h3 className="text-sm font-semibold">Running Benchmark</h3>
+            <h3 className="text-sm font-semibold">{t('runningBenchmark')}</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {progress.completedTasks} / {progress.totalTasks} tasks
+              {progress.completedTasks} / {progress.totalTasks} {t('tasks')}
             </p>
           </div>
           <span className="ml-auto text-sm font-mono font-semibold text-primary">{percent}%</span>
@@ -36,19 +39,19 @@ export function RunProgress({ progress, onCancel }: RunProgressProps) {
         <div className="text-xs text-muted-foreground space-y-1.5 font-mono">
           {progress.currentEndpoint && (
             <div className="flex justify-between">
-              <span>Endpoint</span>
+              <span>{t('endpoint')}</span>
               <span className="text-foreground font-medium">{progress.currentEndpoint}</span>
             </div>
           )}
           {progress.currentRound && progress.totalRounds && (
             <div className="flex justify-between">
-              <span>Round</span>
+              <span>{t('round')}</span>
               <span className="text-foreground">{progress.currentRound} / {progress.totalRounds}</span>
             </div>
           )}
           {progress.currentConcurrency && (
             <div className="flex justify-between">
-              <span>Concurrency</span>
+              <span>{t('concurrency')}</span>
               <span className="text-primary font-medium">{progress.currentConcurrency}x</span>
             </div>
           )}
@@ -78,7 +81,7 @@ export function RunProgress({ progress, onCancel }: RunProgressProps) {
         )}
 
         <Button variant="destructive" size="default" onClick={onCancel} className="w-full">
-          <XCircle className="h-4 w-4 mr-1.5" /> Cancel
+          <XCircle className="h-4 w-4 mr-1.5" /> {t('cancel')}
         </Button>
       </div>
     </div>

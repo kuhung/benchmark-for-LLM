@@ -6,6 +6,7 @@ import { checkConnectivity, fetchModels } from '@/lib/benchmark/runner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Trash2, Wifi, WifiOff, Loader2, ChevronDown, Search, Check } from 'lucide-react'
+import { useI18n } from '@/lib/i18n'
 
 export const PRESETS = [
   { label: 'Ollama', baseUrl: 'http://localhost:11434', modelId: 'default' },
@@ -31,6 +32,7 @@ function ModelIdSelector({
   apiKey?: string
   onChange: (modelId: string) => void
 }) {
+  const { t } = useI18n()
   const [open, setOpen] = useState(false)
   const [models, setModels] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
@@ -46,11 +48,11 @@ function ModelIdSelector({
     if (result.ok) {
       setModels(result.models)
       if (result.models.length === 0) {
-        setError('未发现可用模型')
+        setError('noModelsFound') // will be translated later
       }
     } else {
       setModels([])
-      setError(result.error ?? '请求失败')
+      setError(result.error ?? 'requestFailed')
     }
   }, [baseUrl, apiKey])
 
@@ -92,7 +94,7 @@ function ModelIdSelector({
           size="icon"
           className="shrink-0"
           onClick={handleToggle}
-          title="发现可用模型"
+          title={t('discoverModels')}
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -107,7 +109,7 @@ function ModelIdSelector({
             <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             <input
               className="flex-1 bg-transparent text-sm font-mono outline-none placeholder:text-muted-foreground/50"
-              placeholder="搜索模型..."
+              placeholder={t('searchModel')}
               value={filter}
               onChange={e => setFilter(e.target.value)}
               autoFocus
@@ -117,14 +119,14 @@ function ModelIdSelector({
             {loading && (
               <div className="flex items-center justify-center gap-2 py-4 text-xs text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                正在发现模型...
+                {t('discoveringModels')}
               </div>
             )}
             {!loading && error && (
-              <div className="px-3 py-3 text-xs text-destructive text-center font-mono">{error}</div>
+              <div className="px-3 py-3 text-xs text-destructive text-center font-mono">{t(error as any)}</div>
             )}
             {!loading && !error && filtered.length === 0 && models.length > 0 && (
-              <div className="px-3 py-3 text-xs text-muted-foreground text-center">无匹配结果</div>
+              <div className="px-3 py-3 text-xs text-muted-foreground text-center">{t('noMatch')}</div>
             )}
             {!loading &&
               filtered.map(m => (
@@ -150,12 +152,13 @@ function ModelIdSelector({
 }
 
 export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
+  const { t } = useI18n()
   const [connectStatus, setConnectStatus] = useState<Record<string, 'checking' | 'ok' | 'error'>>({})
 
   const addEndpoint = () => {
     const newEndpoint: Endpoint = {
       id: crypto.randomUUID(),
-      name: `Endpoint ${endpoints.length + 1}`,
+      name: `${t('defaultEndpointName')} ${endpoints.length + 1}`,
       baseUrl: 'http://localhost:11434',
       modelId: 'llama3.2',
     }
@@ -183,9 +186,9 @@ export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
   return (
     <div className="rounded-lg border border-border bg-card p-5 space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Endpoints</h2>
+        <h2 className="text-sm font-semibold">{t('endpoints')}</h2>
         <Button variant="outline" size="sm" onClick={addEndpoint}>
-          <Plus className="h-3.5 w-3.5 mr-1.5" /> Add
+          <Plus className="h-3.5 w-3.5 mr-1.5" /> {t('add')}
         </Button>
       </div>
 
@@ -218,15 +221,15 @@ export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
             {/* 核心配置字段 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Name</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t('name')}</label>
                 <Input value={ep.name} onChange={e => updateEndpoint(ep.id, { name: e.target.value })} placeholder="My Model" />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Base URL</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t('baseUrl')}</label>
                 <Input value={ep.baseUrl} onChange={e => updateEndpoint(ep.id, { baseUrl: e.target.value })} placeholder="http://localhost:11434" />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Model ID</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t('modelId')}</label>
                 <ModelIdSelector
                   value={ep.modelId}
                   baseUrl={ep.baseUrl}
@@ -235,7 +238,7 @@ export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">API Key (Optional)</label>
+                <label className="mb-1 block text-xs text-muted-foreground">{t('apiKeyOptional')}</label>
                 <Input type="password" value={ep.apiKey || ''} onChange={e => updateEndpoint(ep.id, { apiKey: e.target.value || undefined })} placeholder="sk-..." />
               </div>
             </div>
@@ -256,7 +259,7 @@ export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
                 {connectStatus[ep.id] === 'ok' && <Wifi className="h-3.5 w-3.5 mr-1.5" />}
                 {connectStatus[ep.id] === 'error' && <WifiOff className="h-3.5 w-3.5 mr-1.5" />}
                 {!connectStatus[ep.id] && <Wifi className="h-3.5 w-3.5 mr-1.5 opacity-50" />}
-                Test Connection
+                {t('testConnection')}
               </Button>
             </div>
           </div>
@@ -264,8 +267,8 @@ export function EndpointConfig({ endpoints, onChange }: EndpointConfigProps) {
 
         {endpoints.length === 0 && (
           <div className="rounded-md border border-dashed border-border p-8 text-center">
-            <p className="text-sm text-muted-foreground">No endpoints configured</p>
-            <p className="text-xs text-muted-foreground/60 mt-1">Click "Add" to configure your first endpoint</p>
+            <p className="text-sm text-muted-foreground">{t('noEndpoints')}</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">{t('clickAdd')}</p>
           </div>
         )}
       </div>

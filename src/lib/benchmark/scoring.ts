@@ -4,8 +4,8 @@ const THRESHOLDS = {
   speed: { min: 5, max: 100 },
   responsiveness: { best: 100, worst: 2000 },
   smoothness: { best: 20, worst: 200 },
-  scalability: { min: 0.3, max: 1.0 },
-  stability: { best: 0.05, worst: 0.8 },
+  scalability: { min: 0.15, max: 1.0 },
+  stability: { best: 0.05, worst: 1.0 },
 } as const
 
 export function computeRadarScore(
@@ -29,9 +29,9 @@ export function computeRadarScore(
   let scalability = 50
   if (concurrencyResults.length >= 2) {
     const c1 = concurrencyResults.find(r => r.concurrency === 1)
-    const c8 = concurrencyResults.find(r => r.concurrency === 8) || concurrencyResults[concurrencyResults.length - 1]
-    if (c1 && c8 && c1.metrics.tps.median > 0) {
-      const ratio = c8.metrics.tps.median / c1.metrics.tps.median
+    const cMax = concurrencyResults.find(r => r.concurrency === 8) || concurrencyResults[concurrencyResults.length - 1]
+    if (c1 && cMax && c1.metrics.tps.median > 0) {
+      const ratio = cMax.metrics.tps.median / c1.metrics.tps.median
       scalability = linearScore(ratio, THRESHOLDS.scalability.min, THRESHOLDS.scalability.max)
     }
   }
@@ -39,7 +39,9 @@ export function computeRadarScore(
   const cv = singleMetrics.ttft.mean > 0
     ? singleMetrics.ttft.stdDev / singleMetrics.ttft.mean
     : 0
-  const stability = inverseLinearScore(cv, THRESHOLDS.stability.best, THRESHOLDS.stability.worst)
+  const latencyConsistency = inverseLinearScore(cv, THRESHOLDS.stability.best, THRESHOLDS.stability.worst)
+  const successFactor = singleMetrics.successRate / 100
+  const stability = latencyConsistency * 0.7 + successFactor * 100 * 0.3
 
   const overall = Math.round((speed + responsiveness + smoothness + scalability + stability) / 5)
 

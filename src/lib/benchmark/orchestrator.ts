@@ -122,7 +122,7 @@ export class BenchmarkOrchestrator {
       const promises = Array.from({ length: batchSize }, () =>
         runSingleBenchmark(
           endpoint,
-          config.prompt,
+          typeof config.prompt === 'string' ? config.prompt : (config.prompt.zh || config.prompt.en), // use Chinese as default if object, fallback to en
           config.maxTokens,
           this.abortController!.signal,
           () => undefined

@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { Endpoint, BenchmarkConfig, BenchmarkProgress, BenchmarkSession } from '@/lib/benchmark/types'
 import { BenchmarkOrchestrator } from '@/lib/benchmark/orchestrator'
 import { fetchModels } from '@/lib/benchmark/runner'
+import { saveSession } from '@/lib/store'
 import { DEFAULT_PROMPT } from '@/lib/prompts'
 import { EndpointConfig, PRESETS } from '@/components/endpoint-config'
 import { BenchmarkSettings } from '@/components/benchmark-settings'
@@ -12,19 +13,23 @@ import { ResultDashboard } from '@/components/result-dashboard'
 import { HistoryList } from '@/components/history-list'
 import { CompareView } from '@/components/compare-view'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { LangToggle } from '@/components/lang-toggle'
 import { Button } from '@/components/ui/button'
 import { Play, RotateCcw, Clock, Gauge, Loader2 } from 'lucide-react'
+import { useI18n } from '@/lib/i18n'
 
 export default function Home() {
+  const { t, lang } = useI18n()
   const [activeTab, setActiveTab] = useState<'new' | 'history'>('new')
   const [endpoints, setEndpoints] = useState<Endpoint[]>([])
   const [isDiscovering, setIsDiscovering] = useState(true)
   const [config, setConfig] = useState<BenchmarkConfig>({
-    prompt: DEFAULT_PROMPT,
+    prompt: { ...DEFAULT_PROMPT },
     maxTokens: 256,
     repeatCount: 5,
     concurrencyLevels: [1, 2, 4, 8],
   })
+
   const [progress, setProgress] = useState<BenchmarkProgress>({ status: 'idle', completedTasks: 0, totalTasks: 0 })
   const [session, setSession] = useState<BenchmarkSession | null>(null)
   const [orchestrator, setOrchestrator] = useState<BenchmarkOrchestrator | null>(null)
@@ -78,13 +83,17 @@ export default function Home() {
     setProgress({ status: 'running', completedTasks: 0, totalTasks: 0 })
 
     try {
-      const result = await orch.run(endpoints, config)
+      const actualPrompt = typeof config.prompt === 'string' ? config.prompt : config.prompt[lang]
+      const actualConfig = { ...config, prompt: actualPrompt }
+      const result = await orch.run(endpoints, actualConfig)
       setSession(result)
+      await saveSession(result)
+      setHistoryRefresh(n => n + 1)
     } catch (err) {
       console.error('Benchmark failed:', err)
       setProgress(p => ({ ...p, status: 'error' }))
     }
-  }, [endpoints, config])
+  }, [endpoints, config, lang])
 
   const cancelBenchmark = () => {
     orchestrator?.cancel()
@@ -115,7 +124,7 @@ export default function Home() {
                 }`}
                 onClick={() => setActiveTab('new')}
               >
-                New Test
+                {t('newTest')}
               </button>
               <button
                 className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 ${
@@ -126,9 +135,10 @@ export default function Home() {
                 onClick={() => setActiveTab('history')}
               >
                 <Clock className="h-3.5 w-3.5" />
-                History
+                {t('history')}
               </button>
             </div>
+            <LangToggle />
             <ThemeToggle />
           </div>
         </div>
@@ -144,7 +154,7 @@ export default function Home() {
                   {isDiscovering ? (
                     <div className="rounded-lg border border-border bg-card p-12 flex flex-col items-center justify-center space-y-3">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                      <p className="text-sm text-muted-foreground">正在自动发现可用的 API 端点与模型...</p>
+                      <p className="text-sm text-muted-foreground">{t('discovering')}</p>
                     </div>
                   ) : (
                     <EndpointConfig endpoints={endpoints} onChange={setEndpoints} />
@@ -153,7 +163,7 @@ export default function Home() {
 
                 {/* Step 2: 测试参数 */}
                 <section className="rounded-lg border border-border bg-card p-5">
-                  <h2 className="text-sm font-semibold mb-4">Test Parameters</h2>
+                  <h2 className="text-sm font-semibold mb-4">{t('testParameters')}</h2>
                   <BenchmarkSettings config={config} onChange={setConfig} />
                 </section>
 
@@ -165,14 +175,14 @@ export default function Home() {
                   disabled={endpoints.length === 0 || progress.status === 'running'}
                 >
                   <Play className="h-4 w-4 mr-2 fill-current" />
-                  Run Benchmark
+                  {t('runBenchmark')}
                 </Button>
               </div>
             )}
 
             {session && (
               <div className="space-y-6 animate-fade-in">
-                <ResultDashboard session={session} onSaved={() => setHistoryRefresh(n => n + 1)} />
+                <ResultDashboard session={session} />
                 <Button
                   variant="outline"
                   size="lg"
@@ -180,7 +190,7 @@ export default function Home() {
                   onClick={() => setSession(null)}
                 >
                   <RotateCcw className="h-4 w-4 mr-2" />
-                  New Test
+                  {t('newTest')}
                 </Button>
               </div>
             )}
@@ -197,7 +207,7 @@ export default function Home() {
                   size="sm"
                   onClick={() => setCompareSessions(null)}
                 >
-                  <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> Close Comparison
+                  <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> {t('closeComparison')}
                 </Button>
               </div>
             )}

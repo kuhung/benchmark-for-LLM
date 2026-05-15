@@ -1,3 +1,8 @@
+export interface LocalizedString {
+  en: string
+  zh: string
+}
+
 export interface Endpoint {
   id: string
   name: string
@@ -77,7 +82,7 @@ export interface RadarScore {
 }
 
 export interface BenchmarkConfig {
-  prompt: string
+  prompt: LocalizedString | string
   maxTokens: number
   repeatCount: number
   concurrencyLevels: number[]

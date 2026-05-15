@@ -4,6 +4,7 @@ import { BenchmarkConfig } from '@/lib/benchmark/types'
 import { PROMPT_PRESETS } from '@/lib/prompts'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useI18n } from '@/lib/i18n'
 
 interface BenchmarkSettingsProps {
   config: BenchmarkConfig
@@ -12,36 +13,48 @@ interface BenchmarkSettingsProps {
 }
 
 export function BenchmarkSettings({ config, onChange }: BenchmarkSettingsProps) {
+  const { t, lang } = useI18n()
+
   return (
     <div className="space-y-4">
       {/* Prompt */}
       <div>
-        <label className="mb-1.5 block text-xs text-muted-foreground">Test Prompt</label>
+        <label className="mb-1.5 block text-xs text-muted-foreground">{t('testPrompt')}</label>
         <div className="mb-2 flex flex-wrap gap-1.5">
-          {PROMPT_PRESETS.map(preset => (
-            <Button
-              key={preset.id}
-              variant={config.prompt === preset.content ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onChange({ ...config, prompt: preset.content })}
-              className="h-7 px-2.5 text-xs"
-            >
-              {preset.label}
-            </Button>
-          ))}
+          {PROMPT_PRESETS.map(preset => {
+            const isActive = typeof config.prompt !== 'string' && config.prompt.en === preset.content.en && config.prompt.zh === preset.content.zh
+            return (
+              <Button
+                key={preset.id}
+                variant={isActive ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onChange({ ...config, prompt: { ...preset.content } })}
+                className="h-7 px-2.5 text-xs"
+                title={preset.description[lang]}
+              >
+                {preset.label[lang]}
+              </Button>
+            )
+          })}
         </div>
         <textarea
           className="h-24 w-full resize-none rounded-md border border-border bg-background p-3 text-sm font-mono leading-relaxed transition-colors placeholder:text-muted-foreground/40 focus-visible:border-primary focus-visible:outline-none"
-          value={config.prompt}
-          onChange={e => onChange({ ...config, prompt: e.target.value })}
-          placeholder="Enter custom prompt..."
+          value={typeof config.prompt === 'string' ? config.prompt : config.prompt[lang]}
+          onChange={e => {
+            if (typeof config.prompt === 'string') {
+              onChange({ ...config, prompt: e.target.value })
+            } else {
+              onChange({ ...config, prompt: { ...config.prompt, [lang]: e.target.value } })
+            }
+          }}
+          placeholder={t('enterPrompt')}
         />
       </div>
 
       {/* Parameters */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className="mb-1.5 block text-xs text-muted-foreground">Max Tokens</label>
+          <label className="mb-1.5 block text-xs text-muted-foreground">{t('maxTokens')}</label>
           <Input
             type="number"
             value={config.maxTokens}
@@ -51,7 +64,7 @@ export function BenchmarkSettings({ config, onChange }: BenchmarkSettingsProps) 
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs text-muted-foreground">Repeat Count</label>
+          <label className="mb-1.5 block text-xs text-muted-foreground">{t('repeatCount')}</label>
           <Input
             type="number"
             value={config.repeatCount}
@@ -61,7 +74,7 @@ export function BenchmarkSettings({ config, onChange }: BenchmarkSettingsProps) 
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs text-muted-foreground">Concurrency</label>
+          <label className="mb-1.5 block text-xs text-muted-foreground">{t('concurrency')}</label>
           <div className="flex gap-1.5">
             {[1, 2, 4, 8].map(level => (
               <Button

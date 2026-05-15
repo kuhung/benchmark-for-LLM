@@ -12,6 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
+import { useI18n } from '@/lib/i18n'
 
 const COLORS = ['#a3e635', '#38bdf8', '#f472b6', '#fb923c', '#a78bfa', '#e879f9', '#34d399', '#fbbf24']
 
@@ -19,8 +20,9 @@ interface CompareViewProps {
   sessions: BenchmarkSession[]
 }
 
-function sessionLabel(session: BenchmarkSession): string {
-  return new Date(session.timestamp).toLocaleString('zh-CN', {
+function sessionLabel(session: BenchmarkSession, lang: string): string {
+  const locale = lang === 'zh' ? 'zh-CN' : 'en-US'
+  return new Date(session.timestamp).toLocaleString(locale, {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
@@ -28,11 +30,11 @@ function sessionLabel(session: BenchmarkSession): string {
   })
 }
 
-function flattenResults(sessions: BenchmarkSession[]): { label: string; result: EndpointResult; sessionIdx: number }[] {
+function flattenResults(sessions: BenchmarkSession[], lang: string): { label: string; result: EndpointResult; sessionIdx: number }[] {
   const items: { label: string; result: EndpointResult; sessionIdx: number }[] = []
   sessions.forEach((session, sessionIdx) => {
     for (const result of session.results) {
-      const label = `${result.endpoint.name} (${sessionLabel(session)})`
+      const label = `${result.endpoint.name} (${sessionLabel(session, lang)})`
       items.push({ label, result, sessionIdx })
     }
   })
@@ -48,7 +50,8 @@ const tooltipStyle = {
 }
 
 export function CompareView({ sessions }: CompareViewProps) {
-  const items = flattenResults(sessions)
+  const { t, lang } = useI18n()
+  const items = flattenResults(sessions, lang)
 
   const ttftData = items.map(({ label, result, sessionIdx }) => ({
     name: label,
@@ -71,9 +74,9 @@ export function CompareView({ sessions }: CompareViewProps) {
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-border bg-card p-5">
-        <h2 className="text-base font-semibold">Session Comparison</h2>
+        <h2 className="text-base font-semibold">{t('sessionComparison')}</h2>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Comparing {sessions.length} sessions / {items.length} endpoints
+          {t('comparing')} {sessions.length} {t('sessions')} / {items.length} {t('endpointCount')}
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {sessions.map((s, i) => (
@@ -83,33 +86,33 @@ export function CompareView({ sessions }: CompareViewProps) {
               style={{ backgroundColor: `${COLORS[i % COLORS.length]}20`, color: COLORS[i % COLORS.length] }}
             >
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-              {sessionLabel(s)}
+              {sessionLabel(s, lang)}
             </span>
           ))}
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <CompareBarChart title="TTFT Comparison (ms)" data={ttftData} />
-        <CompareBarChart title="TPS Comparison (t/s)" data={tpsData} />
+        <CompareBarChart title={t('ttftComparison')} data={ttftData} />
+        <CompareBarChart title={t('tpsComparison')} data={tpsData} />
       </div>
-      <CompareBarChart title="Success Rate (%)" data={successData} />
+      <CompareBarChart title={t('successRate')} data={successData} />
 
       <div className="rounded-lg border border-border bg-card overflow-hidden">
         <div className="px-5 py-3 border-b border-border">
-          <h3 className="text-sm font-semibold">Detailed Comparison</h3>
+          <h3 className="text-sm font-semibold">{t('detailedComparison')}</h3>
         </div>
         <div className="p-4 overflow-x-auto">
           <table className="data-table w-full min-w-[700px] text-sm font-mono">
             <thead>
               <tr className="border-b border-border">
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">Session</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">Endpoint</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">TTFT P50</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">TPS P50</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">ITL P95</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">E2E P50</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">Success</th>
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">{t('session')}</th>
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">{t('endpoint')}</th>
+                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('ttftP50')}</th>
+                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('tpsP50')}</th>
+                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('itlP95')}</th>
+                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('e2eP50')}</th>
+                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('success')}</th>
               </tr>
             </thead>
             <tbody>
@@ -120,7 +123,7 @@ export function CompareView({ sessions }: CompareViewProps) {
                       className="inline-block h-2 w-2 rounded-full mr-1.5"
                       style={{ backgroundColor: COLORS[sessionIdx % COLORS.length] }}
                     />
-                    <span className="text-xs text-muted-foreground">{sessionLabel(sessions[sessionIdx])}</span>
+                    <span className="text-xs text-muted-foreground">{sessionLabel(sessions[sessionIdx], lang)}</span>
                   </td>
                   <td className="px-3 py-3 font-medium">{result.endpoint.name}</td>
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.ttft.median.toFixed(0)}</td>

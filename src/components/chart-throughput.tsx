@@ -15,11 +15,14 @@ import {
 
 const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 
+import { useI18n } from '@/lib/i18n'
+
 interface ChartThroughputProps {
   results: EndpointResult[]
 }
 
 export function ChartThroughput({ results }: ChartThroughputProps) {
+  const { t } = useI18n()
   const allConcurrencies = [...new Set(results.flatMap(r => r.concurrencyResults.map(c => c.concurrency)))].sort((a, b) => a - b)
 
   const data = allConcurrencies.map(concurrency => {
@@ -53,12 +56,12 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Concurrency Scaling</CardTitle>
+        <CardTitle>{t('throughputChartTitle')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div>
-            <p className="mb-3 text-xs text-muted-foreground">TPS vs Concurrency</p>
+            <p className="mb-3 text-xs text-muted-foreground">{t('throughputTpsVsConcurrency')}</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
@@ -94,7 +97,7 @@ export function ChartThroughput({ results }: ChartThroughputProps) {
             </ResponsiveContainer>
           </div>
           <div>
-            <p className="mb-3 text-xs text-muted-foreground">TTFT vs Concurrency (ms)</p>
+            <p className="mb-3 text-xs text-muted-foreground">{t('throughputTtftVsConcurrency')}</p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />

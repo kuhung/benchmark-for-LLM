@@ -48,12 +48,12 @@ export async function importSession(json: string): Promise<BenchmarkSession> {
 
 function normalizeImportedSession(value: unknown): BenchmarkSession {
   if (!isRecord(value)) {
-    throw new Error('JSON 不是有效的 BenchmarkSession')
+    throw new Error('Invalid BenchmarkSession / JSON 不是有效的 BenchmarkSession')
   }
 
   const session = value as unknown as BenchmarkSession
   if (!session.id || !session.timestamp || !session.config || !Array.isArray(session.results)) {
-    throw new Error('JSON 缺少必要的测评会话字段')
+    throw new Error('Missing required fields / JSON 缺少必要的测评会话字段')
   }
 
   return {

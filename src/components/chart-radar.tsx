@@ -12,20 +12,25 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
+import { useI18n } from '@/lib/i18n'
+
 const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
-const DIMENSIONS = [
-  { key: 'speed', label: 'Speed' },
-  { key: 'responsiveness', label: 'Response' },
-  { key: 'smoothness', label: 'Smooth' },
-  { key: 'scalability', label: 'Scale' },
-  { key: 'stability', label: 'Stable' },
-]
 
 interface ChartRadarProps {
   results: EndpointResult[]
 }
 
 export function ChartRadar({ results }: ChartRadarProps) {
+  const { t } = useI18n()
+  
+  const DIMENSIONS = [
+    { key: 'speed', label: t('radarSpeed') },
+    { key: 'responsiveness', label: t('radarResponse') },
+    { key: 'smoothness', label: t('radarSmooth') },
+    { key: 'scalability', label: t('radarScale') },
+    { key: 'stability', label: t('radarStable') },
+  ]
+
   const data = DIMENSIONS.map(dim => {
     const entry: Record<string, string | number> = { dimension: dim.label }
     results.forEach(r => {
@@ -41,7 +46,7 @@ export function ChartRadar({ results }: ChartRadarProps) {
     <Card>
       <CardHeader>
         <CardTitle>
-          Overall Score
+          {t('overallScore')}
           {results.map(r => r.score && (
             <span key={r.endpoint.id} className="ml-3 text-xs font-normal text-muted-foreground font-mono">
               {r.endpoint.name} ({r.endpoint.modelId}): {r.score.overall}
@@ -72,7 +77,7 @@ export function ChartRadar({ results }: ChartRadarProps) {
                   dataKey={keyName}
                   stroke={ECHARTS_COLORS[i % ECHARTS_COLORS.length]}
                   fill={ECHARTS_COLORS[i % ECHARTS_COLORS.length]}
-                  fillOpacity={0.1}
+                  fillOpacity={0.25}
                   strokeWidth={2}
                 />
               )

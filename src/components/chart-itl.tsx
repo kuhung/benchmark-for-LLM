@@ -15,11 +15,14 @@ import {
 
 const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 
+import { useI18n } from '@/lib/i18n'
+
 interface ChartITLProps {
   results: EndpointResult[]
 }
 
 export function ChartITL({ results }: ChartITLProps) {
+  const { t } = useI18n()
   const data = results.map(result => ({
     name: `${result.endpoint.name} (${result.endpoint.modelId})`,
     p50: Number(result.singleConcurrency.itl.median.toFixed(1)),
@@ -30,7 +33,7 @@ export function ChartITL({ results }: ChartITLProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>ITL Distribution (ms)</CardTitle>
+        <CardTitle>{t('itlChartTitle')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={260}>
@@ -58,9 +61,9 @@ export function ChartITL({ results }: ChartITLProps) {
               labelStyle={{ color: 'var(--foreground)', marginBottom: '4px' }}
             />
             <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }} />
-            <Bar dataKey="p50" name="P50" fill={ECHARTS_COLORS[0]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
-            <Bar dataKey="p95" name="P95" fill={ECHARTS_COLORS[1]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
-            <Bar dataKey="p99" name="P99" fill={ECHARTS_COLORS[3]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="p50" name={t('legendP50')} fill={ECHARTS_COLORS[0]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="p95" name={t('legendP95')} fill={ECHARTS_COLORS[1]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="p99" name={t('legendP99')} fill={ECHARTS_COLORS[3]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

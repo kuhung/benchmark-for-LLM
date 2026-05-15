@@ -14,7 +14,8 @@ export function generateMarkdownReport(session: BenchmarkSession): string {
   lines.push(`- **Repeat Count**: ${session.config.repeatCount}`)
   lines.push(`- **Max Tokens**: ${session.config.maxTokens}`)
   lines.push(`- **Concurrency Levels**: ${session.config.concurrencyLevels.join(', ')}`)
-  lines.push(`- **Prompt**: ${session.config.prompt.length > 80 ? session.config.prompt.slice(0, 80) + '...' : session.config.prompt}`)
+  const promptStr = typeof session.config.prompt === 'string' ? session.config.prompt : (session.config.prompt.zh || session.config.prompt.en)
+  lines.push(`- **Prompt**: ${promptStr.length > 80 ? promptStr.slice(0, 80) + '...' : promptStr}`)
   lines.push('')
 
   lines.push('## Endpoints')

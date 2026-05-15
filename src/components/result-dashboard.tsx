@@ -8,18 +8,20 @@ import { ChartTPS } from '@/components/chart-tps'
 import { ChartITL } from '@/components/chart-itl'
 import { ChartThroughput } from '@/components/chart-throughput'
 import { ChartPercentile } from '@/components/chart-percentile'
-import { Download, Save, FileSpreadsheet, FileText } from 'lucide-react'
-import { saveSession, exportSession } from '@/lib/store'
+import { Download, Check, FileSpreadsheet, FileText } from 'lucide-react'
+import { exportSession } from '@/lib/store'
 import { exportCSV } from '@/lib/export-csv'
 import { generateMarkdownReport } from '@/lib/report'
 import { RawDataTable } from '@/components/raw-data-table'
+import { useI18n } from '@/lib/i18n'
 
 interface ResultDashboardProps {
   session: BenchmarkSession
-  onSaved?: () => void
 }
 
-export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
+export function ResultDashboard({ session }: ResultDashboardProps) {
+  const { t } = useI18n()
+
   const handleExport = async () => {
     const json = await exportSession(session)
     const blob = new Blob([json], { type: 'application/json' })
@@ -29,11 +31,6 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
     a.download = `benchmark-${new Date(session.timestamp).toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
-  }
-
-  const handleSave = async () => {
-    await saveSession(session)
-    onSaved?.()
   }
 
   const handleExportCSV = () => {
@@ -68,15 +65,15 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
       <div className="rounded-lg border border-border bg-card p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-5">
           <div>
-            <h2 className="text-base font-semibold">Results</h2>
+            <h2 className="text-base font-semibold">{t('results')}</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {session.results.length} endpoints / {session.config.repeatCount}x repeats / concurrency {session.config.concurrencyLevels.join(', ')}
+              {session.results.length} {t('endpointCount')} / {session.config.repeatCount} {t('repeats')} / {t('concurrency')} {session.config.concurrencyLevels.join(', ')}
             </p>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" size="sm" onClick={handleSave}>
-              <Save className="h-3.5 w-3.5 mr-1.5" /> Save
-            </Button>
+          <div className="flex gap-2 flex-wrap items-center">
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Check className="h-3.5 w-3.5" /> {t('autoSaved')}
+            </span>
             <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="h-3.5 w-3.5 mr-1.5" /> JSON
             </Button>
@@ -84,7 +81,7 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
               <FileSpreadsheet className="h-3.5 w-3.5 mr-1.5" /> CSV
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportMarkdown}>
-              <FileText className="h-3.5 w-3.5 mr-1.5" /> Report
+              <FileText className="h-3.5 w-3.5 mr-1.5" /> {t('report')}
             </Button>
           </div>
         </div>
@@ -92,22 +89,22 @@ export function ResultDashboard({ session, onSaved }: ResultDashboardProps) {
         {/* 核心指标卡片：用户第一眼看到最重要的数字 */}
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-md bg-muted p-4">
-            <p className="text-xs text-muted-foreground">Best TTFT</p>
+            <p className="text-xs text-muted-foreground">{t('bestTtft')}</p>
             <p className="text-2xl font-semibold font-mono tabular-nums mt-1">
               {bestTtft.toFixed(0)}
               <span className="text-sm font-normal text-muted-foreground ml-1">ms</span>
             </p>
           </div>
           <div className="rounded-md bg-muted p-4">
-            <p className="text-xs text-muted-foreground">Best TPS</p>
+            <p className="text-xs text-muted-foreground">{t('bestTps')}</p>
             <p className="text-2xl font-semibold font-mono tabular-nums mt-1">
               {bestTps.toFixed(1)}
               <span className="text-sm font-normal text-muted-foreground ml-1">t/s</span>
             </p>
           </div>
-          <div className="rounded-md bg-primary/10 border border-primary/20 p-4">
-            <p className="text-xs text-primary/70">Avg Success</p>
-            <p className="text-2xl font-semibold font-mono tabular-nums mt-1 text-primary">
+          <div className="rounded-md bg-muted p-4">
+            <p className="text-xs text-muted-foreground">{t('avgSuccess')}</p>
+            <p className="text-2xl font-semibold font-mono tabular-nums mt-1">
               {avgSuccess.toFixed(0)}%
             </p>
           </div>

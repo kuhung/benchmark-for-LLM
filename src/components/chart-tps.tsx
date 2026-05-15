@@ -15,11 +15,14 @@ import {
 
 const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 
+import { useI18n } from '@/lib/i18n'
+
 interface ChartTPSProps {
   results: EndpointResult[]
 }
 
 export function ChartTPS({ results }: ChartTPSProps) {
+  const { t } = useI18n()
   const data = results.map((r, i) => ({
     name: `${r.endpoint.name} (${r.endpoint.modelId})`,
     median: Number(r.singleConcurrency.tps.median.toFixed(1)),
@@ -29,7 +32,7 @@ export function ChartTPS({ results }: ChartTPSProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>TPS (tokens/s)</CardTitle>
+        <CardTitle>{t('tpsChartTitle')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={260}>
@@ -56,7 +59,7 @@ export function ChartTPS({ results }: ChartTPSProps) {
               }}
               labelStyle={{ color: 'var(--foreground)', marginBottom: '4px' }}
             />
-            <Bar dataKey="median" name="TPS (P50)" radius={[3, 3, 0, 0]}>
+            <Bar dataKey="median" name={t('legendTpsP50')} radius={[3, 3, 0, 0]}>
               {data.map(entry => (
                 <Cell key={entry.name} fill={entry.fill} fillOpacity={0.9} />
               ))}

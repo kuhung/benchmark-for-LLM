@@ -15,6 +15,8 @@ import {
 
 const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 
+import { useI18n } from '@/lib/i18n'
+
 interface ChartPercentileProps {
   results: EndpointResult[]
 }
@@ -32,6 +34,7 @@ function extractPercentiles(stats: StatsSummary): number[] {
 }
 
 export function ChartPercentile({ results }: ChartPercentileProps) {
+  const { t } = useI18n()
   const data = PERCENTILE_LABELS.map((label, i) => {
     const entry: Record<string, string | number> = { percentile: label }
     for (const r of results) {
@@ -45,7 +48,7 @@ export function ChartPercentile({ results }: ChartPercentileProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>TTFT Latency Percentiles (ms)</CardTitle>
+        <CardTitle>{t('percentileChartTitle')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={260}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { EndpointResult } from '@/lib/benchmark/types'
+import { useI18n } from '@/lib/i18n'
 
 interface RawDataTableProps {
   results: EndpointResult[]
@@ -24,6 +25,7 @@ function rankColor(value: number, allValues: number[], direction: RankDirection)
 }
 
 export function RawDataTable({ results }: RawDataTableProps) {
+  const { t } = useI18n()
   const hasStreamingDetails = results.some(r => r.streamingDetails)
   const ttftValues = results.map(r => r.singleConcurrency.ttft.median)
   const tpsValues = results.map(r => r.singleConcurrency.tps.median)
@@ -34,22 +36,22 @@ export function RawDataTable({ results }: RawDataTableProps) {
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="px-5 py-3 border-b border-border">
-        <h3 className="text-sm font-semibold">Raw Data</h3>
+        <h3 className="text-sm font-semibold">{t('rawData')}</h3>
       </div>
       <div className="p-4 overflow-x-auto">
         <table className="data-table w-full min-w-[640px] text-sm font-mono">
           <thead>
             <tr className="border-b border-border">
-              <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">Endpoint</th>
-              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">TTFT (ms)</th>
-              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">TPS</th>
-              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">ITL P95 (ms)</th>
-              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">E2E (ms)</th>
-              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">Success</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">{t('endpoint')}</th>
+              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('ttftMs')}</th>
+              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('tps')}</th>
+              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('itlP95')}</th>
+              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('e2eMs')}</th>
+              <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('success')}</th>
               {hasStreamingDetails && (
                 <>
-                  <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">Chars/Chunk</th>
-                  <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">Chunk Interval</th>
+                  <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('charsPerChunk')}</th>
+                  <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('chunkInterval')}</th>
                 </>
               )}
             </tr>

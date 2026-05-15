@@ -15,11 +15,14 @@ import {
 
 const ECHARTS_COLORS = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 
+import { useI18n } from '@/lib/i18n'
+
 interface ChartTTFTProps {
   results: EndpointResult[]
 }
 
 export function ChartTTFT({ results }: ChartTTFTProps) {
+  const { t } = useI18n()
   const data = results.map((r) => ({
     name: `${r.endpoint.name} (${r.endpoint.modelId})`,
     p50: Number(r.singleConcurrency.ttft.median.toFixed(1)),
@@ -30,7 +33,7 @@ export function ChartTTFT({ results }: ChartTTFTProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>TTFT (ms)</CardTitle>
+        <CardTitle>{t('ttftChartTitle')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={260}>
@@ -58,9 +61,9 @@ export function ChartTTFT({ results }: ChartTTFTProps) {
               labelStyle={{ color: 'var(--foreground)', marginBottom: '4px' }}
             />
             <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '11px', opacity: 0.7 }} />
-            <Bar dataKey="p50" name="P50" fill={ECHARTS_COLORS[0]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
-            <Bar dataKey="p95" name="P95" fill={ECHARTS_COLORS[1]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
-            <Bar dataKey="max" name="Max (Cold Start)" fill={ECHARTS_COLORS[3]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="p50" name={t('legendP50')} fill={ECHARTS_COLORS[0]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="p95" name={t('legendP95')} fill={ECHARTS_COLORS[1]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="max" name={t('legendMaxColdStart')} fill={ECHARTS_COLORS[3]} fillOpacity={0.9} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
