@@ -96,19 +96,39 @@ def compute_stats(values: list[float]) -> StatsSummary:
 
 
 def _extract_content(chunk: dict) -> str | None:
+    # OpenAI standard: choices[0].delta.content / choices[0].message.content
     choices = chunk.get("choices", [])
-    if not choices:
-        return None
-    first = choices[0]
-    delta = first.get("delta", {}) if isinstance(first, dict) else {}
-    message = first.get("message", {}) if isinstance(first, dict) else {}
-    return (
-        delta.get("content")
-        or message.get("content")
-        or delta.get("text")
-        or message.get("text")
-        or (first.get("text") if isinstance(first, dict) else None)
-    ) or None
+    if choices and isinstance(choices[0], dict):
+        first = choices[0]
+        delta = first.get("delta", {}) or {}
+        message = first.get("message", {}) or {}
+        content = (
+            delta.get("content")
+            or message.get("content")
+            or delta.get("text")
+            or message.get("text")
+            or first.get("text")
+        )
+        if content:
+            return content
+
+    # Ollama native: top-level message.content
+    top_msg = chunk.get("message")
+    if isinstance(top_msg, dict) and top_msg.get("content"):
+        return top_msg["content"]
+
+    # Ollama /api/generate: top-level response
+    if chunk.get("response") and isinstance(chunk["response"], str):
+        return chunk["response"]
+
+    # LM Studio event data: top-level content / delta.content
+    if chunk.get("content") and isinstance(chunk["content"], str):
+        return chunk["content"]
+    top_delta = chunk.get("delta")
+    if isinstance(top_delta, dict) and top_delta.get("content"):
+        return top_delta["content"]
+
+    return None
 
 
 async def run_single_benchmark(
@@ -147,7 +167,7 @@ async def run_single_benchmark(
                 )
             async for line in response.aiter_lines():
                 stripped = line.strip()
-                if not stripped:
+                if not stripped or stripped.startswith("event:") or stripped.startswith(":"):
                     continue
                 if stripped.startswith("data:"):
                     data = stripped[6:] if stripped.startswith("data: ") else stripped[5:]
@@ -162,6 +182,8 @@ async def run_single_benchmark(
                         chunk = json.loads(stripped)
                     except json.JSONDecodeError:
                         continue
+                    if chunk.get("done") is True:
+                        break
                 else:
                     continue
                 content = _extract_content(chunk)
