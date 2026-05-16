@@ -12,8 +12,6 @@ export const PRESETS = [
   { label: 'Ollama', baseUrl: 'http://localhost:11434', modelId: 'default' },
   { label: 'LM Studio', baseUrl: 'http://localhost:1234', modelId: 'default' },
   { label: 'oMLX', baseUrl: 'http://localhost:8000', modelId: 'default' },
-  { label: 'OpenAI', baseUrl: 'https://api.openai.com', modelId: 'default' },
-  { label: 'Anthropic', baseUrl: 'https://api.anthropic.com', modelId: 'default' },
 ]
 
 interface EndpointConfigProps {

@@ -29,7 +29,7 @@ export default function Home() {
     maxTokens: 256,
     repeatCount: 5,
     concurrencyLevels: [1, 2, 4, 8],
-    thinkingEnabled: false,
+    thinkingEnabled: true,
   })
 
   const [progress, setProgress] = useState<BenchmarkProgress>({ status: 'idle', completedTasks: 0, totalTasks: 0 })
