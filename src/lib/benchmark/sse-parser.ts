@@ -21,18 +21,23 @@ function extractContent(json: unknown): string | undefined {
       nonEmptyString(first?.text)
     if (content) return content
 
-    // Reasoning models (DeepSeek-R1, Qwen3, Gemma 4, etc.) may put all
-    // output into reasoning_content while content stays empty/null.
-    // LM Studio bug tracker #1602
+    // Reasoning models may put output into reasoning/reasoning_content
+    // while content stays empty.
+    // Ollama uses "reasoning", LM Studio uses "reasoning_content" (lmstudio#1602)
     const reasoning =
+      nonEmptyString(delta?.reasoning) ??
       nonEmptyString(delta?.reasoning_content) ??
+      nonEmptyString(message?.reasoning) ??
       nonEmptyString(message?.reasoning_content)
     if (reasoning) return reasoning
   }
 
   // Ollama native format: top-level message.content
   const topMessage = obj.message as Record<string, unknown> | undefined
-  const topMsgContent = nonEmptyString(topMessage?.content) ?? nonEmptyString(topMessage?.reasoning_content)
+  const topMsgContent =
+    nonEmptyString(topMessage?.content) ??
+    nonEmptyString(topMessage?.reasoning) ??
+    nonEmptyString(topMessage?.reasoning_content)
   if (topMsgContent) return topMsgContent
 
   // Ollama native /api/generate: top-level response field
