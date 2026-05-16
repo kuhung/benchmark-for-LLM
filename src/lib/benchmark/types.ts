@@ -87,6 +87,7 @@ export interface BenchmarkConfig {
   maxTokens: number
   repeatCount: number
   concurrencyLevels: number[]
+  thinkingEnabled?: boolean
 }
 
 export interface BenchmarkSession {

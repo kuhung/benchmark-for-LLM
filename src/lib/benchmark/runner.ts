@@ -3,12 +3,17 @@ import { parseSSEStream } from './sse-parser'
 
 const DEFAULT_TIMEOUT = 60_000
 
+export interface RunOptions {
+  thinkingEnabled?: boolean
+}
+
 export async function runSingleBenchmark(
   endpoint: Endpoint,
   prompt: string,
   maxTokens: number,
   signal?: AbortSignal,
-  onToken?: (timestamp: number) => void
+  onToken?: (timestamp: number) => void,
+  options?: RunOptions
 ): Promise<RawResult> {
   const tokenTimestamps: number[] = []
   const chunkSizes: number[] = []
@@ -29,15 +34,22 @@ export async function runSingleBenchmark(
       headers['Authorization'] = `Bearer ${endpoint.apiKey}`
     }
 
+    const body: Record<string, unknown> = {
+      model: endpoint.modelId,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: maxTokens,
+      stream: true,
+    }
+    // Ollama: "think" (top-level); OpenAI: "reasoning_effort"
+    if (options?.thinkingEnabled === false) {
+      body.think = false
+      body.reasoning_effort = 'none'
+    }
+
     const response = await fetch(`${endpoint.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        model: endpoint.modelId,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: maxTokens,
-        stream: true,
-      }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     })
 

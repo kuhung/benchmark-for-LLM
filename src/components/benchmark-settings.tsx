@@ -99,6 +99,31 @@ export function BenchmarkSettings({ config, onChange }: BenchmarkSettingsProps) 
           </div>
         </div>
       </div>
+
+      {/* Thinking Mode */}
+      <div>
+        <div className="flex items-center justify-between">
+          <label className="text-xs text-muted-foreground">{t('thinkingMode')}</label>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={config.thinkingEnabled ?? false}
+            onClick={() => onChange({ ...config, thinkingEnabled: !(config.thinkingEnabled ?? false) })}
+            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors ${
+              config.thinkingEnabled ? 'bg-primary' : 'bg-muted'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-3.5 w-3.5 rounded-full bg-background shadow-sm ring-0 transition-transform ${
+                config.thinkingEnabled ? 'translate-x-4' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </div>
+        <p className="mt-1 text-[11px] text-muted-foreground/70 leading-relaxed">
+          {t('thinkingDesc')}
+        </p>
+      </div>
     </div>
   )
 }

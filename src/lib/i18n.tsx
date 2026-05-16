@@ -47,6 +47,10 @@ export const translations = {
   maxTokens: { en: 'Max Tokens', zh: '最大 Token 数 (Max Tokens)' },
   repeatCount: { en: 'Repeat Count', zh: '重复次数 (Repeat)' },
   concurrency: { en: 'Concurrency', zh: '并发数 (Concurrency)' },
+  thinkingMode: { en: 'Thinking Mode', zh: '推理模式 (Thinking)' },
+  thinkingOn: { en: 'On', zh: '开启' },
+  thinkingOff: { en: 'Off', zh: '关闭' },
+  thinkingDesc: { en: 'When off, requests include think=false to skip model reasoning. Some providers may ignore this.', zh: '关闭时请求携带 think=false 跳过模型推理过程，部分服务商可能不支持此参数。' },
   runBenchmark: { en: 'Run Benchmark', zh: '开始测试' },
   
   // Progress

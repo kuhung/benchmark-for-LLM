@@ -20,6 +20,7 @@ export function generateMarkdownReport(session: BenchmarkSession): string {
     : undefined
   const promptLabel = promptPreset ? `${promptPreset.label.en} / ${promptPreset.label.zh}` : 'Custom'
   const promptStr = typeof session.config.prompt === 'string' ? session.config.prompt : (session.config.prompt.zh || session.config.prompt.en)
+  lines.push(`- **Thinking Mode**: ${session.config.thinkingEnabled ? 'Enabled' : 'Disabled'}`)
   lines.push(`- **Prompt Scenario**: ${promptLabel}`)
   lines.push(`- **Prompt**: ${promptStr.length > 80 ? promptStr.slice(0, 80) + '...' : promptStr}`)
   lines.push('')

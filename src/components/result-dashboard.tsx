@@ -97,7 +97,7 @@ export function ResultDashboard({ session }: ResultDashboardProps) {
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {session.config.repeatCount}x {t('repeats')} / {t('concurrency')} {session.config.concurrencyLevels.join(', ')} / Max {session.config.maxTokens} tokens
+              {session.config.repeatCount}x {t('repeats')} / {t('concurrency')} {session.config.concurrencyLevels.join(', ')} / Max {session.config.maxTokens} tokens / {t('thinkingMode')}: {session.config.thinkingEnabled ? t('thinkingOn') : t('thinkingOff')}
             </p>
           </div>
           <div className="flex gap-2 flex-wrap items-center">
