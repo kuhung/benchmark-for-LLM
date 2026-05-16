@@ -4,6 +4,7 @@ export function exportCSV(session: BenchmarkSession): string {
   const headers = [
     'Endpoint',
     'Model',
+    'Cold Start TTFT (ms)',
     'TTFT P50 (ms)',
     'TTFT P95 (ms)',
     'TTFT P99 (ms)',
@@ -22,6 +23,7 @@ export function exportCSV(session: BenchmarkSession): string {
     return [
       csvEscape(r.endpoint.name),
       csvEscape(r.endpoint.modelId),
+      r.coldStartTtft != null ? r.coldStartTtft.toFixed(1) : '',
       m.ttft.median.toFixed(1),
       m.ttft.p95.toFixed(1),
       m.ttft.p99.toFixed(1),

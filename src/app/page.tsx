@@ -15,12 +15,13 @@ import { CompareView } from '@/components/compare-view'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LangToggle } from '@/components/lang-toggle'
 import { Button } from '@/components/ui/button'
-import { Play, RotateCcw, Clock, Gauge, Loader2 } from 'lucide-react'
+import { DocsGuide } from '@/components/docs-guide'
+import { Play, RotateCcw, Clock, Gauge, Loader2, BookOpen } from 'lucide-react'
 import { useI18n } from '@/lib/i18n'
 
 export default function Home() {
   const { t, lang } = useI18n()
-  const [activeTab, setActiveTab] = useState<'new' | 'history'>('new')
+  const [activeTab, setActiveTab] = useState<'new' | 'history' | 'guide'>('new')
   const [endpoints, setEndpoints] = useState<Endpoint[]>([])
   const [isDiscovering, setIsDiscovering] = useState(true)
   const [config, setConfig] = useState<BenchmarkConfig>({
@@ -142,6 +143,17 @@ export default function Home() {
                 <Clock className="h-3.5 w-3.5" />
                 {t('history')}
               </button>
+              <button
+                className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 ${
+                  activeTab === 'guide'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                onClick={() => setActiveTab('guide')}
+              >
+                <BookOpen className="h-3.5 w-3.5" />
+                {t('guide')}
+              </button>
             </div>
             <LangToggle />
             <ThemeToggle />
@@ -223,6 +235,8 @@ export default function Home() {
             />
           </div>
         )}
+
+        {activeTab === 'guide' && <DocsGuide />}
       </div>
 
       <RunProgress progress={progress} onCancel={cancelBenchmark} />

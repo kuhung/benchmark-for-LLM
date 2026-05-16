@@ -78,6 +78,10 @@ export function ResultDashboard({ session }: ResultDashboardProps) {
   const bestTps = Math.max(...session.results.map(r => r.singleConcurrency.tps.median))
   const bestTtft = Math.min(...session.results.map(r => r.singleConcurrency.ttft.median))
   const avgSuccess = session.results.reduce((sum, r) => sum + r.singleConcurrency.successRate, 0) / session.results.length
+  const hasColdStart = session.results.some(r => r.coldStartTtft != null)
+  const maxColdStart = hasColdStart
+    ? Math.max(...session.results.filter(r => r.coldStartTtft != null).map(r => r.coldStartTtft!))
+    : null
 
   return (
     <div className="space-y-6">
@@ -116,8 +120,8 @@ export function ResultDashboard({ session }: ResultDashboardProps) {
           </div>
         </div>
 
-        {/* 核心指标卡片：用户第一眼看到最重要的数字 */}
-        <div className="grid gap-3 sm:grid-cols-3">
+        {/* 核心指标卡片 */}
+        <div className={`grid gap-3 ${hasColdStart ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
           <div className="rounded-md bg-muted p-4">
             <p className="text-xs text-muted-foreground">{t('bestTtft')}</p>
             <p className="text-2xl font-semibold font-mono tabular-nums mt-1">
@@ -132,6 +136,15 @@ export function ResultDashboard({ session }: ResultDashboardProps) {
               <span className="text-sm font-normal text-muted-foreground ml-1">t/s</span>
             </p>
           </div>
+          {hasColdStart && maxColdStart != null && (
+            <div className="rounded-md bg-muted p-4">
+              <p className="text-xs text-muted-foreground">{t('coldStartTtft')}</p>
+              <p className="text-2xl font-semibold font-mono tabular-nums mt-1">
+                {maxColdStart.toFixed(0)}
+                <span className="text-sm font-normal text-muted-foreground ml-1">ms</span>
+              </p>
+            </div>
+          )}
           <div className="rounded-md bg-muted p-4">
             <p className="text-xs text-muted-foreground">{t('avgSuccess')}</p>
             <p className="text-2xl font-semibold font-mono tabular-nums mt-1">

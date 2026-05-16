@@ -110,6 +110,7 @@ export function CompareView({ sessions }: CompareViewProps) {
               <tr className="border-b border-border">
                 <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">{t('session')}</th>
                 <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">{t('endpoint')}</th>
+                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('coldStartTtft')}</th>
                 <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('ttftP50')}</th>
                 <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('tpsP50')}</th>
                 <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('itlP95')}</th>
@@ -130,6 +131,9 @@ export function CompareView({ sessions }: CompareViewProps) {
                   <td className="px-3 py-3">
                     <span className="font-medium">{result.endpoint.name}</span>
                     <span className="text-xs text-muted-foreground ml-1.5">{result.endpoint.modelId}</span>
+                  </td>
+                  <td className="px-3 py-3 text-right tabular-nums">
+                    {result.coldStartTtft != null ? result.coldStartTtft.toFixed(0) : '-'}
                   </td>
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.ttft.median.toFixed(0)}</td>
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.tps.median.toFixed(1)}</td>

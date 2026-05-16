@@ -32,15 +32,26 @@ export function generateMarkdownReport(session: BenchmarkSession): string {
   }
   lines.push('')
 
+  const hasColdStart = session.results.some(r => r.coldStartTtft != null)
+
   lines.push('## Performance Summary (Single Concurrency)')
   lines.push('')
-  lines.push('| Endpoint | TTFT P50 (ms) | TTFT IQR | TPS P50 | TPS IQR | ITL P95 (ms) | E2E P50 (ms) | Success |')
-  lines.push('|----------|---------------|----------|---------|---------|--------------|--------------|---------|')
+  if (hasColdStart) {
+    lines.push('| Endpoint | Cold Start (ms) | TTFT P50 (ms) | TTFT IQR | TPS P50 | TPS IQR | ITL P95 (ms) | E2E P50 (ms) | Success |')
+    lines.push('|----------|-----------------|---------------|----------|---------|---------|--------------|--------------|---------|')
+  } else {
+    lines.push('| Endpoint | TTFT P50 (ms) | TTFT IQR | TPS P50 | TPS IQR | ITL P95 (ms) | E2E P50 (ms) | Success |')
+    lines.push('|----------|---------------|----------|---------|---------|--------------|--------------|---------|')
+  }
 
   for (const r of session.results) {
     const m = r.singleConcurrency
+    const coldCol = hasColdStart
+      ? `| ${r.coldStartTtft != null ? r.coldStartTtft.toFixed(0) : '-'} `
+      : ''
     lines.push(
       `| ${r.endpoint.name} ` +
+      coldCol +
       `| ${m.ttft.median.toFixed(0)} ` +
       `| ${formatIQR(m.ttft)} ` +
       `| ${m.tps.median.toFixed(1)} ` +

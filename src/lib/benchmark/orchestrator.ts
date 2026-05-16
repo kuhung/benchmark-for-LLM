@@ -8,7 +8,7 @@ import {
   BenchmarkSession,
 } from './types'
 import { runSingleBenchmark } from './runner'
-import { aggregateMetrics, computeSingleMetrics, computeStreamingDetails } from './metrics'
+import { aggregateMetrics, computeSingleMetrics, computeStreamingDetails, extractColdStartTtft } from './metrics'
 import { computeRadarScore } from './scoring'
 
 export class BenchmarkOrchestrator {
@@ -92,6 +92,7 @@ export class BenchmarkOrchestrator {
 
     const score = computeRadarScore(singleConcurrency, concurrencyResults)
     const streamingDetails = computeStreamingDetails(allRawResults)
+    const coldStartTtft = extractColdStartTtft(allRawResults)
 
     return {
       endpoint,
@@ -100,6 +101,7 @@ export class BenchmarkOrchestrator {
       rawResults: allRawResults,
       score,
       streamingDetails,
+      coldStartTtft,
     }
   }
 

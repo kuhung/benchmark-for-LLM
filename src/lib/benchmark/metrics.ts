@@ -83,6 +83,12 @@ function emptyStats(): StatsSummary {
   return { mean: 0, median: 0, p75: 0, p90: 0, p95: 0, p99: 0, min: 0, max: 0, stdDev: 0 }
 }
 
+export function extractColdStartTtft(rawResults: RawResult[]): number | undefined {
+  const firstSuccess = rawResults.find(r => r.status === 'success' && r.tokenTimestamps.length > 0)
+  if (!firstSuccess) return undefined
+  return firstSuccess.tokenTimestamps[0] - firstSuccess.requestStart
+}
+
 export function computeStreamingDetails(rawResults: RawResult[]): StreamingDetails | undefined {
   const successful = rawResults.filter(r => r.status === 'success' && r.tokenTimestamps.length > 1)
   if (successful.length === 0) return undefined

@@ -27,11 +27,13 @@ function rankColor(value: number, allValues: number[], direction: RankDirection)
 export function RawDataTable({ results }: RawDataTableProps) {
   const { t } = useI18n()
   const hasStreamingDetails = results.some(r => r.streamingDetails)
+  const hasColdStart = results.some(r => r.coldStartTtft != null)
   const ttftValues = results.map(r => r.singleConcurrency.ttft.median)
   const tpsValues = results.map(r => r.singleConcurrency.tps.median)
   const itlValues = results.map(r => r.singleConcurrency.itl.p95)
   const e2eValues = results.map(r => r.singleConcurrency.e2eLatency.median)
   const successValues = results.map(r => r.singleConcurrency.successRate)
+  const coldStartValues = results.filter(r => r.coldStartTtft != null).map(r => r.coldStartTtft!)
 
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
@@ -43,6 +45,9 @@ export function RawDataTable({ results }: RawDataTableProps) {
           <thead>
             <tr className="border-b border-border">
               <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">{t('endpoint')}</th>
+              {hasColdStart && (
+                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('coldStartTtft')}</th>
+              )}
               <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('ttftMs')}</th>
               <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('tps')}</th>
               <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('itlP95')}</th>
@@ -65,6 +70,11 @@ export function RawDataTable({ results }: RawDataTableProps) {
                     <span className="text-xs text-muted-foreground font-normal">{r.endpoint.modelId}</span>
                   </div>
                 </td>
+                {hasColdStart && (
+                  <td className={`px-3 py-3 text-right tabular-nums ${r.coldStartTtft != null ? rankColor(r.coldStartTtft, coldStartValues, 'desc') : ''}`}>
+                    {r.coldStartTtft != null ? r.coldStartTtft.toFixed(0) : '-'}
+                  </td>
+                )}
                 <td className={`px-3 py-3 text-right tabular-nums ${rankColor(r.singleConcurrency.ttft.median, ttftValues, 'desc')}`}>
                   {r.singleConcurrency.ttft.median.toFixed(0)}
                 </td>

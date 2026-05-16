@@ -70,6 +70,7 @@ export interface EndpointResult {
   rawResults: RawResult[]
   score?: RadarScore
   streamingDetails?: StreamingDetails
+  coldStartTtft?: number
 }
 
 export interface RadarScore {

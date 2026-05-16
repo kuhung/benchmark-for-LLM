@@ -50,7 +50,7 @@ export const translations = {
   thinkingMode: { en: 'Thinking Mode', zh: '推理模式 (Thinking)' },
   thinkingOn: { en: 'On', zh: '开启' },
   thinkingOff: { en: 'Off', zh: '关闭' },
-  thinkingDesc: { en: 'When off, requests include think=false to skip model reasoning. Some providers may ignore this.', zh: '关闭时请求携带 think=false 跳过模型推理过程，部分服务商可能不支持此参数。' },
+  thinkingDesc: { en: 'When off, requests include think=false to skip model reasoning. Some providers may ignore this. Only effective when reasoning model is enabled.', zh: '关闭时请求携带 think=false 跳过模型推理过程，部分服务商可能不支持此参数。仅推理模型时此开关有效。' },
   runBenchmark: { en: 'Run Benchmark', zh: '开始测试' },
   
   // Progress
@@ -131,6 +131,17 @@ export const translations = {
   radarStable: { en: 'Stability', zh: '响应稳定' },
   radarStableDesc: { en: 'Response latency consistency. Higher = more predictable', zh: '延迟一致性和成功率，越高=表现越稳定' },
   radarHigherIsBetter: { en: 'All dimensions: higher (outward) = better', zh: '所有维度：越靠外=表现越好' },
+
+  // Cold start
+  coldStartTtft: { en: 'Cold Start TTFT', zh: '冷启动延迟 (Cold Start)' },
+  coldStartTtftDesc: { en: 'TTFT of the very first request — includes model loading for local inference', zh: '首次请求的首字延迟 -- 本地推理时包含模型加载耗时' },
+  coldStartOverhead: { en: 'Cold Start Overhead', zh: '冷启动开销' },
+
+  // Guide / Docs
+  guide: { en: 'Guide', zh: '使用指南' },
+  guideMetricsTitle: { en: 'Metrics Guide', zh: '指标说明' },
+  guideCorsTitle: { en: 'CORS Guide', zh: '跨域解决指南' },
+  guideFrameworkTitle: { en: 'Supported Frameworks', zh: '支持的推理框架' },
 
   // History / session info
   promptLabel: { en: 'Prompt', zh: '提示词' },
