@@ -47,24 +47,24 @@ export async function* parseSSEStream(
   const decoder = new TextDecoder()
   let buffer = ''
   let yieldedAny = false
-  const debugLines: string[] = []
-  const MAX_DEBUG_LINES = 5
+  let rawOutput = ''
+  const MAX_RAW_LENGTH = 2000
 
   while (true) {
     const { done, value } = await reader.read()
     if (done) break
 
-    buffer += decoder.decode(value, { stream: true })
+    const chunkStr = decoder.decode(value, { stream: true })
+    if (rawOutput.length < MAX_RAW_LENGTH) {
+      rawOutput += chunkStr
+    }
+    buffer += chunkStr
     const lines = buffer.split('\n')
     buffer = lines.pop() || ''
 
     for (const line of lines) {
       const trimmed = line.trim()
       if (!trimmed) continue
-
-      if (debugLines.length < MAX_DEBUG_LINES) {
-        debugLines.push(trimmed.slice(0, 200))
-      }
 
       // Skip SSE event type declarations (LM Studio named events: "event: message.delta")
       if (trimmed.startsWith('event:') || trimmed.startsWith(':')) continue
@@ -108,10 +108,6 @@ export async function* parseSSEStream(
   if (buffer.trim()) {
     const trimmed = buffer.trim()
 
-    if (debugLines.length < MAX_DEBUG_LINES) {
-      debugLines.push(`[buffer] ${trimmed.slice(0, 200)}`)
-    }
-
     if (trimmed.startsWith('data:')) {
       const data = trimmed.startsWith('data: ') ? trimmed.slice(6) : trimmed.slice(5)
       if (data !== '[DONE]') {
@@ -143,9 +139,21 @@ export async function* parseSSEStream(
   }
 
   if (!yieldedAny) {
-    console.warn(
-      '[sse-parser] No content chunks extracted. First lines of response:\n' +
-      debugLines.map((l, i) => `  ${i + 1}: ${l}`).join('\n')
-    )
+    // Try to parse the entire raw output as a single JSON object (in case stream: true was ignored)
+    try {
+      const parsed = JSON.parse(rawOutput)
+      const content = extractContent(parsed)
+      if (content) {
+        console.log('[sse-parser] Recovered content from non-streaming JSON response')
+        yield content
+        return
+      }
+    } catch {
+      // Not a valid single JSON
+    }
+
+    const preview = rawOutput.slice(0, MAX_RAW_LENGTH)
+    console.error('[sse-parser] No content chunks extracted. Raw response preview:\n' + preview)
+    throw new Error(`No content chunks extracted. Raw response: ${preview || '<empty>'}`)
   }
 }

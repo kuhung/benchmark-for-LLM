@@ -70,13 +70,6 @@ export async function runSingleBenchmark(
       }
     }
 
-    if (tokenTimestamps.length === 0) {
-      console.warn(
-        `[benchmark-runner] No tokens parsed from ${endpoint.baseUrl}. ` +
-        `Content-Type: ${contentType}. Response body was ${response.body ? 'present' : 'null'}.`
-      )
-    }
-
     return {
       endpointId: endpoint.id,
       requestStart,

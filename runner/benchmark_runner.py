@@ -158,14 +158,24 @@ async def run_single_benchmark(
             timeout=60.0,
         ) as response:
             if response.status_code != 200:
+                error_body = ""
+                try:
+                    error_body = await response.aread()
+                    error_body = error_body.decode("utf-8")[:200]
+                except Exception:
+                    pass
                 return RawResult(
                     endpoint_id=endpoint.id,
                     request_start=request_start,
                     request_end=time.perf_counter(),
                     status="error",
-                    error=f"HTTP {response.status_code}",
+                    error=f"HTTP {response.status_code}: {error_body}",
                 )
+            
+            raw_output = ""
             async for line in response.aiter_lines():
+                if len(raw_output) < 2000:
+                    raw_output += line + "\n"
                 stripped = line.strip()
                 if not stripped or stripped.startswith("event:") or stripped.startswith(":"):
                     continue
@@ -189,6 +199,26 @@ async def run_single_benchmark(
                 content = _extract_content(chunk)
                 if content:
                     token_timestamps.append(time.perf_counter())
+            
+            if not token_timestamps:
+                try:
+                    parsed = json.loads(raw_output)
+                    content = _extract_content(parsed)
+                    if content:
+                        token_timestamps.append(time.perf_counter())
+                except json.JSONDecodeError:
+                    pass
+                if not token_timestamps:
+                    error_msg = f"No content chunks extracted. Raw response: {raw_output[:500] or '<empty>'}"
+                    console.print(f"[yellow]Warning: {error_msg}[/yellow]")
+                    return RawResult(
+                        endpoint_id=endpoint.id,
+                        request_start=request_start,
+                        request_end=time.perf_counter(),
+                        status="error",
+                        error=error_msg,
+                    )
+
     except Exception as e:
         return RawResult(
             endpoint_id=endpoint.id,
