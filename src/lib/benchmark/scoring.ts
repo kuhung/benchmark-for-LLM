@@ -12,6 +12,13 @@ export function computeRadarScore(
   singleMetrics: AggregatedMetrics,
   concurrencyResults: ConcurrencyResult[]
 ): RadarScore {
+  // When no requests succeeded, all dimension metrics are meaningless zeros --
+  // return an all-zero score instead of the misleading values that
+  // inverseLinearScore(0, ...) would produce.
+  if (singleMetrics.successRate === 0) {
+    return { speed: 0, responsiveness: 0, smoothness: 0, scalability: 0, stability: 0, overall: 0 }
+  }
+
   const speed = linearScore(singleMetrics.tps.median, THRESHOLDS.speed.min, THRESHOLDS.speed.max)
 
   const responsiveness = inverseLinearScore(

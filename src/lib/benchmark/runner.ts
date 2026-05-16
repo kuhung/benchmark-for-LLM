@@ -82,6 +82,8 @@ export async function runSingleBenchmark(
   } catch (err) {
     const isTimeout = err instanceof DOMException && err.name === 'AbortError'
     const requestEnd = performance.now()
+    const errorMsg = err instanceof Error ? err.message : String(err)
+    console.warn(`[benchmark] ${endpoint.name} (${endpoint.modelId}): ${isTimeout ? 'timeout' : 'error'} - ${errorMsg}`)
     return {
       endpointId: endpoint.id,
       requestStart,
@@ -89,7 +91,7 @@ export async function runSingleBenchmark(
       tokenTimestamps,
       outputTokenCount: tokenTimestamps.length,
       status: isTimeout ? 'timeout' : 'error',
-      error: err instanceof Error ? err.message : String(err),
+      error: errorMsg,
     }
   }
 }

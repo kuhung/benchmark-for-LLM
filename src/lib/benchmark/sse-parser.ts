@@ -1,3 +1,7 @@
+function nonEmptyString(val: unknown): string | undefined {
+  return typeof val === 'string' && val.length > 0 ? val : undefined
+}
+
 function extractContent(json: unknown): string | undefined {
   if (!json || typeof json !== 'object') return undefined
   const obj = json as Record<string, unknown>
@@ -8,35 +12,36 @@ function extractContent(json: unknown): string | undefined {
     const first = choices[0]
     const delta = first?.delta as Record<string, unknown> | undefined
     const message = first?.message as Record<string, unknown> | undefined
-    const content = (
-      (delta?.content as string) ??
-      (message?.content as string) ??
-      (delta?.text as string) ??
-      (message?.text as string) ??
-      (first?.text as string)
-    )
+
+    const content =
+      nonEmptyString(delta?.content) ??
+      nonEmptyString(message?.content) ??
+      nonEmptyString(delta?.text) ??
+      nonEmptyString(message?.text) ??
+      nonEmptyString(first?.text)
     if (content) return content
+
+    // Reasoning models (DeepSeek-R1, Qwen3, Gemma 4, etc.) may put all
+    // output into reasoning_content while content stays empty/null.
+    // LM Studio bug tracker #1602
+    const reasoning =
+      nonEmptyString(delta?.reasoning_content) ??
+      nonEmptyString(message?.reasoning_content)
+    if (reasoning) return reasoning
   }
 
   // Ollama native format: top-level message.content
   const topMessage = obj.message as Record<string, unknown> | undefined
-  if (topMessage?.content && typeof topMessage.content === 'string') {
-    return topMessage.content
-  }
+  const topMsgContent = nonEmptyString(topMessage?.content) ?? nonEmptyString(topMessage?.reasoning_content)
+  if (topMsgContent) return topMsgContent
 
   // Ollama native /api/generate: top-level response field
-  if (obj.response && typeof obj.response === 'string') {
-    return obj.response as string
-  }
+  if (nonEmptyString(obj.response)) return obj.response as string
 
   // LM Studio event data: top-level content / delta.content
-  if (obj.content && typeof obj.content === 'string') {
-    return obj.content as string
-  }
+  if (nonEmptyString(obj.content)) return obj.content as string
   const topDelta = obj.delta as Record<string, unknown> | undefined
-  if (topDelta?.content && typeof topDelta.content === 'string') {
-    return topDelta.content as string
-  }
+  if (nonEmptyString(topDelta?.content)) return topDelta!.content as string
 
   return undefined
 }
@@ -75,13 +80,18 @@ export async function* parseSSEStream(
 
         try {
           const parsed = JSON.parse(data)
+          // Detect inline error objects (some providers return errors with HTTP 200)
+          if (parsed?.error) {
+            const errMsg = parsed.error?.message ?? parsed.error?.type ?? JSON.stringify(parsed.error)
+            throw new Error(`API returned error: ${errMsg}`)
+          }
           const content = extractContent(parsed)
           if (content) {
             yieldedAny = true
             yield content
           }
-        } catch {
-          // skip malformed SSE JSON
+        } catch (e) {
+          if (e instanceof Error && e.message.startsWith('API returned error:')) throw e
         }
         continue
       }
@@ -142,13 +152,22 @@ export async function* parseSSEStream(
     // Try to parse the entire raw output as a single JSON object (in case stream: true was ignored)
     try {
       const parsed = JSON.parse(rawOutput)
+
+      // Detect error responses returned with HTTP 200
+      const errObj = parsed?.error as Record<string, unknown> | undefined
+      if (errObj) {
+        const errMsg = (errObj.message ?? errObj.type ?? JSON.stringify(errObj)) as string
+        throw new Error(`API returned error: ${errMsg}`)
+      }
+
       const content = extractContent(parsed)
       if (content) {
         console.log('[sse-parser] Recovered content from non-streaming JSON response')
         yield content
         return
       }
-    } catch {
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith('API returned error:')) throw e
       // Not a valid single JSON
     }
 
