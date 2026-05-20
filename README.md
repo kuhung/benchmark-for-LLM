@@ -154,8 +154,9 @@ graph TB
 - 所有结果存在浏览器 IndexedDB，刷新不丢失
 - 用户隐私完全保护 -- API Key 等敏感信息不离开浏览器
 
-**Python Runner 作为补充**：
-- 独立的 Python 脚本，不依赖 Web 服务
+**Python Runner 作为补充**（[PyPI](https://pypi.org/project/llm-benchmark-runner/)）：
+- 通过 `pip install llm-benchmark-runner` 或 `uv pip install llm-benchmark-runner` 一键安装
+- 安装后使用 `llm-benchmark --url ... --model ...` 命令行运行
 - 输出标准 JSON 格式，可拖拽导入 Web 页面查看图表
 - 适用于：CORS 无法配置、无头服务器 SSH 环境、CI/CD 集成
 
@@ -168,7 +169,7 @@ graph TB
 - IndexedDB via idb（本地存储）
 - Vercel（部署）
 
-**Python Runner：**
+**Python Runner：**（`pip install llm-benchmark-runner`）
 - httpx（异步流式 HTTP）
 - asyncio（并发）
 - rich（终端美化）
@@ -286,10 +287,16 @@ benchmark-for-LLM/
 │       ├── chart-radar.tsx              # 雷达图
 │       ├── compare-view.tsx             # 历史 Session 对比视图
 │       └── history-list.tsx             # 历史记录与 JSON 导入/导出
-├── runner/
-│   ├── benchmark_runner.py             # Python CLI Runner 主入口
-│   ├── requirements.txt                # httpx, rich
-│   └── README.md                       # Runner 使用说明
+├── runner/                                # Python CLI 包（PyPI: llm-benchmark-runner）
+│   ├── src/llm_benchmark_runner/          # 包源码
+│   │   ├── __init__.py                    # 版本声明
+│   │   ├── __main__.py                    # python -m 入口
+│   │   └── cli.py                         # CLI 主逻辑
+│   ├── benchmark_runner.py                # 向后兼容入口
+│   ├── pyproject.toml                     # 包构建配置
+│   ├── requirements.txt                   # 快速安装依赖（旧方式）
+│   ├── LICENSE
+│   └── README.md                          # PyPI 包说明
 ├── public/
 ├── package.json
 ├── tsconfig.json
@@ -372,6 +379,47 @@ Web 端直接从浏览器请求本地 API，需要模型服务端配置 CORS：
 | **MLX LM** | `mlx_lm.server --cors` |
 
 如果无法配置 CORS，使用 Python Runner 代替。
+
+---
+
+## Python CLI 安装与使用
+
+### 安装
+
+```bash
+# 推荐：通过 pip 安装
+pip install llm-benchmark-runner
+
+# 或通过 uv 安装
+uv pip install llm-benchmark-runner
+```
+
+### 快速使用
+
+```bash
+# 测试本地 Ollama
+llm-benchmark --url http://localhost:11434 --model llama3.2
+
+# 测试远程 API（带 API Key）
+llm-benchmark --url https://api.example.com --model gpt-4 --api-key sk-xxx
+
+# 完整参数
+llm-benchmark \
+  --url http://localhost:11434 \
+  --model llama3.2 \
+  --repeat 10 \
+  --concurrency 1,2,4,8 \
+  --output results.json
+```
+
+### 结果导入 Web 端
+
+CLI 输出的 JSON 文件与 Web 端完全兼容，导入步骤：
+
+1. 打开 Web 端
+2. 切换到 "历史记录" Tab
+3. 点击 "导入" 按钮，选择 CLI 产出的 JSON 文件
+4. 即可查看完整的可视化图表、雷达评分和对比分析
 
 ---
 

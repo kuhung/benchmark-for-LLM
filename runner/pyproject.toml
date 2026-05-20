@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "llm-benchmark-runner"
+version = "0.2.0"
+description = "LLM Inference Benchmark CLI - measure TTFT, TPS, ITL, E2E latency for any OpenAI-compatible API"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "kuhung", email = "hi@kuhung.me" },
+]
+keywords = ["llm", "benchmark", "inference", "latency", "performance", "ttft", "tps"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Benchmark",
+]
+dependencies = [
+    "httpx>=0.28.0",
+    "rich>=13.9.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/kuhung/benchmark-for-LLM"
+Repository = "https://github.com/kuhung/benchmark-for-LLM"
+Issues = "https://github.com/kuhung/benchmark-for-LLM/issues"
+
+[project.scripts]
+llm-benchmark = "llm_benchmark_runner.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/llm_benchmark_runner"]

@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Added
+- Python CLI 发布为 PyPI 包（`pip install llm-benchmark-runner`），支持 pip 和 uv 安装
+- CLI 安装后提供 `llm-benchmark` 命令，支持 `--version` 参数
+- 支持 `python -m llm_benchmark_runner` 方式运行
+- GitHub Actions 自动发布工作流：tag push 触发构建并发布到 PyPI / TestPyPI
 - i18n (中英文双语) 支持：所有 UI 文案通过统一翻译系统管理，支持一键切换语言
 - 关键指标中文标签后附英文缩写注解（如 "首字延迟 / TTFT"），便于跨语言理解
 - 测试完成后自动保存结果至 IndexedDB，无需手动操作
