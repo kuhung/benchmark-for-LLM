@@ -51,7 +51,7 @@ function QuickStartZh() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="rounded-lg border border-border p-4 relative">
+        <div className="rounded-lg border border-border p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/15 text-blue-500 text-xs font-bold">1</span>
             <span className="font-semibold text-sm">配置端点</span>
@@ -222,7 +222,7 @@ function MetricsGuideZh() {
       </p>
 
       <div className="space-y-4">
-        <div className="rounded-md border-l-2 border-blue-500/60 pl-4">
+        <div>
           <h5 className="font-semibold text-sm flex items-center gap-1.5">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
             Cold Start TTFT -- 冷启动延迟
@@ -246,7 +246,7 @@ function MetricsGuideZh() {
           </table>
         </div>
 
-        <div className="rounded-md border-l-2 border-blue-500/60 pl-4">
+        <div>
           <h5 className="font-semibold text-sm flex items-center gap-1.5">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
             TTFT -- 首字延迟 (Time to First Token)
@@ -274,7 +274,7 @@ function MetricsGuideZh() {
           </table>
         </div>
 
-        <div className="rounded-md border-l-2 border-emerald-500/60 pl-4">
+        <div>
           <h5 className="font-semibold text-sm flex items-center gap-1.5">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
             TPS -- 输出速度 (Tokens Per Second)
@@ -301,7 +301,7 @@ function MetricsGuideZh() {
           </table>
         </div>
 
-        <div className="rounded-md border-l-2 border-emerald-500/60 pl-4">
+        <div>
           <h5 className="font-semibold text-sm flex items-center gap-1.5">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
             ITL P95 -- 输出平滑度 (Inter-Token Latency)
@@ -324,7 +324,7 @@ function MetricsGuideZh() {
           </table>
         </div>
 
-        <div className="rounded-md border-l-2 border-amber-500/60 pl-4">
+        <div>
           <h5 className="font-semibold text-sm flex items-center gap-1.5">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
             并发扩展性 (Scalability)
@@ -336,7 +336,7 @@ function MetricsGuideZh() {
           </p>
         </div>
 
-        <div className="rounded-md border-l-2 border-amber-500/60 pl-4">
+        <div>
           <h5 className="font-semibold text-sm flex items-center gap-1.5">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
             响应稳定性 (Stability)
@@ -347,7 +347,7 @@ function MetricsGuideZh() {
           </p>
         </div>
 
-        <div className="rounded-md border-l-2 border-violet-500/60 pl-4">
+        <div>
           <h5 className="font-semibold text-sm flex items-center gap-1.5">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-violet-500" />
             综合评分 (Overall Score)
@@ -392,63 +392,135 @@ function MetricsGuideEn() {
       </p>
 
       <div className="space-y-4">
-        <div className="rounded-md border-l-2 border-blue-500/60 pl-4">
-          <h5 className="font-semibold text-sm">Cold Start TTFT</h5>
+        <div>
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
+            Cold Start TTFT
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             TTFT of the very first request. Critical for local inference (Ollama / llama.cpp / MLX) --
             the first request often includes model loading and GPU weight transfer, adding seconds of latency.
             <strong> If you care about &quot;how long until the first character after opening a chat&quot;, this is the key metric.</strong>
           </p>
+          <table className="text-xs mt-2 w-full">
+            <tbody>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground w-24">Data Source</td>
+                <td className="py-1.5">TTFT of the first request (requestStart to firstToken)</td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground">Best For</td>
+                <td className="py-1.5">Comparing same model across frameworks, quantization levels, or cold/hot states</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div className="rounded-md border-l-2 border-blue-500/60 pl-4">
-          <h5 className="font-semibold text-sm">TTFT -- Time to First Token</h5>
+        <div>
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
+            TTFT -- Time to First Token
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             Time from request sent to first output token received (ms).
             Reflects prompt processing (prefill) speed.
-            P50 = typical experience, P95 = worst case for most requests.
+            P50 (median) = typical experience, P95 = worst case for most requests.
           </p>
-          <p className="text-muted-foreground text-xs mt-1">
-            <strong>Radar score:</strong> P50 &le;100ms = 100, &ge;2000ms = 0 (inverse linear).
-          </p>
+          <table className="text-xs mt-2 w-full">
+            <tbody>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground w-24">Formula</td>
+                <td className="py-1.5 font-mono">tokenTimestamps[0] - requestStart</td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground">Radar Score</td>
+                <td className="py-1.5">P50 &le; 100ms = 100, &ge; 2000ms = 0 (inverse linear mapping)</td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground">Perception</td>
+                <td className="py-1.5">&lt;200ms feels instant; 200-500ms acceptable; &gt;1s noticeable wait</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div className="rounded-md border-l-2 border-emerald-500/60 pl-4">
-          <h5 className="font-semibold text-sm">TPS -- Tokens Per Second</h5>
+        <div>
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            TPS -- Tokens Per Second
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             Decode rate from first token to last. Denominator excludes TTFT so prefill and decode are orthogonal.
           </p>
-          <p className="text-muted-foreground text-xs mt-1">
-            <strong>Radar score:</strong> P50 &ge;100 t/s = 100, &le;5 t/s = 0 (linear).
-            Human reading speed ~4 t/s; fluent chat &ge;30 t/s; M4 Max local ~60-80 t/s.
-          </p>
+          <table className="text-xs mt-2 w-full">
+            <tbody>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground w-24">Formula</td>
+                <td className="py-1.5 font-mono">outputTokenCount / (requestEnd - firstToken)</td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground">Radar Score</td>
+                <td className="py-1.5">P50 &ge; 100 t/s = 100, &le; 5 t/s = 0 (linear mapping)</td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground">Reference</td>
+                <td className="py-1.5">Human reading ~4 t/s; fluent chat &ge;30 t/s; M4 Max local ~60-80 t/s</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div className="rounded-md border-l-2 border-emerald-500/60 pl-4">
-          <h5 className="font-semibold text-sm">ITL P95 -- Inter-Token Latency</h5>
+        <div>
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            ITL P95 -- Inter-Token Latency
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             Time between consecutive tokens. P95 means 95% of token gaps are within this value.
             High ITL P95 = visible stuttering during output.
           </p>
+          <table className="text-xs mt-2 w-full">
+            <tbody>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground w-24">Radar Score</td>
+                <td className="py-1.5">P95 &le; 20ms = 100, &ge; 200ms = 0 (inverse linear mapping)</td>
+              </tr>
+              <tr className="border-b border-border/50">
+                <td className="py-1.5 pr-3 font-medium text-muted-foreground">Note</td>
+                <td className="py-1.5">SSE chunk size affects ITL precision -- larger chunks = less uniform ITL</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div className="rounded-md border-l-2 border-amber-500/60 pl-4">
-          <h5 className="font-semibold text-sm">Scalability</h5>
+        <div>
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+            Scalability
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
-            TPS ratio at concurrency 8 vs 1. A ratio of 1.0 = perfect scaling; &le;0.15 = severe degradation.
+            TPS ratio at concurrency 8 vs 1. Calculated as
+            <code className="text-xs bg-muted px-1 rounded mx-1">TPS@concurrency=8 / TPS@concurrency=1</code>.
+            A ratio of 1.0 = perfect scaling; &le;0.15 = severe degradation.
           </p>
         </div>
 
-        <div className="rounded-md border-l-2 border-amber-500/60 pl-4">
-          <h5 className="font-semibold text-sm">Stability</h5>
+        <div>
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+            Stability
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
-            Primarily based on TTFT coefficient of variation (lower = more consistent).
+            Primarily based on TTFT coefficient of variation (CV = StdDev / Mean, lower is better).
             High stability = predictable response times.
           </p>
         </div>
 
-        <div className="rounded-md border-l-2 border-violet-500/60 pl-4">
-          <h5 className="font-semibold text-sm">Overall Score</h5>
+        <div>
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-violet-500" />
+            Overall Score
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             Arithmetic mean of five dimensions (0-100). Radar chart: farther out = better.
             Thresholds are calibrated against Apple Silicon M1-M4 empirical ranges.
@@ -595,23 +667,37 @@ function CorsGuideEn() {
           <tbody>
             <tr className="border-b border-border/50">
               <td className="py-2 font-mono font-medium">Ollama</td>
-              <td className="py-2"><code className="text-xs bg-muted px-1.5 py-0.5 rounded">OLLAMA_ORIGINS=&quot;*&quot; ollama serve</code></td>
+              <td className="py-2">
+                <code className="text-xs bg-muted px-1.5 py-0.5 rounded block">OLLAMA_ORIGINS=&quot;*&quot; ollama serve</code>
+                <span className="text-muted-foreground text-[11px] block mt-1">v0.1.29+ defaults to allowing local origins. Cross-origin web requests require explicit setting.</span>
+              </td>
             </tr>
             <tr className="border-b border-border/50">
               <td className="py-2 font-mono font-medium">LM Studio</td>
-              <td className="py-2 text-xs">Settings &rarr; Server &rarr; Enable CORS, or <code className="bg-muted px-1 rounded">lms server start --cors=true</code></td>
+              <td className="py-2">
+                <span className="text-muted-foreground text-[11px]">
+                  Settings &rarr; Server &rarr; Enable CORS (check the box).
+                  Or use CLI: <code className="text-xs bg-muted px-1 rounded">lms server start --cors=true</code>
+                </span>
+              </td>
             </tr>
             <tr className="border-b border-border/50">
               <td className="py-2 font-mono font-medium">llama.cpp</td>
-              <td className="py-2"><code className="text-xs bg-muted px-1.5 py-0.5 rounded">./llama-server --cors-allow-origin &quot;*&quot;</code></td>
+              <td className="py-2">
+                <code className="text-xs bg-muted px-1.5 py-0.5 rounded block">./llama-server --cors-allow-origin &quot;*&quot;</code>
+              </td>
             </tr>
             <tr className="border-b border-border/50">
               <td className="py-2 font-mono font-medium">vLLM</td>
-              <td className="py-2"><code className="text-xs bg-muted px-1.5 py-0.5 rounded">vllm serve model --cors-allow-origins &quot;*&quot;</code></td>
+              <td className="py-2">
+                <code className="text-xs bg-muted px-1.5 py-0.5 rounded block">vllm serve model-name --cors-allow-origins &quot;*&quot;</code>
+              </td>
             </tr>
             <tr>
               <td className="py-2 font-mono font-medium">MLX LM</td>
-              <td className="py-2"><code className="text-xs bg-muted px-1.5 py-0.5 rounded">mlx_lm.server --cors</code></td>
+              <td className="py-2">
+                <code className="text-xs bg-muted px-1.5 py-0.5 rounded block">mlx_lm.server --cors</code>
+              </td>
             </tr>
           </tbody>
         </table>
