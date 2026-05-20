@@ -32,7 +32,6 @@ export function RawDataTable({ results }: RawDataTableProps) {
   const tpsValues = results.map(r => r.singleConcurrency.tps.median)
   const itlValues = results.map(r => r.singleConcurrency.itl.p95)
   const e2eValues = results.map(r => r.singleConcurrency.e2eLatency.median)
-  const successValues = results.map(r => r.singleConcurrency.successRate)
   const coldStartValues = results.filter(r => r.coldStartTtft != null).map(r => r.coldStartTtft!)
 
   return (
@@ -87,7 +86,7 @@ export function RawDataTable({ results }: RawDataTableProps) {
                 <td className={`px-3 py-3 text-right tabular-nums ${rankColor(r.singleConcurrency.e2eLatency.median, e2eValues, 'desc')}`}>
                   {r.singleConcurrency.e2eLatency.median.toFixed(0)}
                 </td>
-                <td className={`px-3 py-3 text-right font-medium tabular-nums ${rankColor(r.singleConcurrency.successRate, successValues, 'asc')}`}>
+                <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">
                   {r.singleConcurrency.successRate.toFixed(0)}%
                 </td>
                 {hasStreamingDetails && (

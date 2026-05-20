@@ -1,18 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useI18n } from '@/lib/i18n'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Zap, BarChart3, Globe, Cpu } from 'lucide-react'
 
-function Section({ title, defaultOpen, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+function Section({ id, title, icon, defaultOpen, children }: {
+  id: string
+  title: string
+  icon?: React.ReactNode
+  defaultOpen?: boolean
+  children: React.ReactNode
+}) {
   const [open, setOpen] = useState(defaultOpen ?? false)
+  const ref = useRef<HTMLDivElement>(null)
+
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
+    <div id={id} ref={ref} className="rounded-lg border border-border bg-card overflow-hidden scroll-mt-4">
       <button
         className="flex w-full items-center justify-between px-5 py-3.5 text-left hover:bg-muted/50 transition-colors"
         onClick={() => setOpen(!open)}
       >
-        <h3 className="text-sm font-semibold">{title}</h3>
+        <div className="flex items-center gap-2.5">
+          {icon}
+          <h3 className="text-sm font-semibold">{title}</h3>
+        </div>
         <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && <div className="border-t border-border px-5 py-4">{children}</div>}
@@ -20,22 +31,205 @@ function Section({ title, defaultOpen, children }: { title: string; defaultOpen?
   )
 }
 
+function QuickStartZh() {
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const button = el.querySelector('button')
+      if (button) button.click()
+    }
+  }
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h4 className="text-base font-semibold mt-0">三步开始测试</h4>
+        <p className="text-muted-foreground text-sm mt-1">
+          LLM Bench 在浏览器中直接测量本地推理服务的性能 -- 无需安装额外软件。
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="rounded-lg border border-border p-4 relative">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/15 text-blue-500 text-xs font-bold">1</span>
+            <span className="font-semibold text-sm">配置端点</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            在"新建测试"页面添加推理服务地址。支持自动发现模型列表，也可手动输入。
+            确保推理框架已启动并开启 CORS。
+          </p>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500 text-xs font-bold">2</span>
+            <span className="font-semibold text-sm">运行测试</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            选择测试提示词、输出长度、重复次数和并发级别，然后点击"开始测试"。
+            测试过程中可以实时查看 TTFT 和 TPS 指标。
+          </p>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-amber-500 text-xs font-bold">3</span>
+            <span className="font-semibold text-sm">对比分析</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            结果自动保存。在"历史记录"中选择 2-4 条记录进行横向对比，
+            通过雷达图和柱状图直观对比不同框架/模型的性能差异。
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-md bg-muted/50 p-4">
+        <h5 className="font-semibold text-xs mb-3 text-muted-foreground uppercase tracking-wider">深入了解</h5>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <button
+            onClick={() => scrollTo('section-metrics')}
+            className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/80 transition-colors group"
+          >
+            <BarChart3 className="h-4 w-4 text-blue-500 shrink-0" />
+            <div>
+              <p className="text-xs font-semibold group-hover:text-blue-500 transition-colors">指标说明</p>
+              <p className="text-[11px] text-muted-foreground">TTFT / TPS / ITL 各指标含义</p>
+            </div>
+          </button>
+          <button
+            onClick={() => scrollTo('section-cors')}
+            className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/80 transition-colors group"
+          >
+            <Globe className="h-4 w-4 text-emerald-500 shrink-0" />
+            <div>
+              <p className="text-xs font-semibold group-hover:text-emerald-500 transition-colors">跨域解决</p>
+              <p className="text-[11px] text-muted-foreground">CORS 配置与本地部署方案</p>
+            </div>
+          </button>
+          <button
+            onClick={() => scrollTo('section-framework')}
+            className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/80 transition-colors group"
+          >
+            <Cpu className="h-4 w-4 text-amber-500 shrink-0" />
+            <div>
+              <p className="text-xs font-semibold group-hover:text-amber-500 transition-colors">推理框架</p>
+              <p className="text-[11px] text-muted-foreground">Ollama / llama.cpp / vLLM 等</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function QuickStartEn() {
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const button = el.querySelector('button')
+      if (button) button.click()
+    }
+  }
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h4 className="text-base font-semibold mt-0">Get started in 3 steps</h4>
+        <p className="text-muted-foreground text-sm mt-1">
+          LLM Bench measures local inference performance directly in the browser -- no extra software required.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="rounded-lg border border-border p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/15 text-blue-500 text-xs font-bold">1</span>
+            <span className="font-semibold text-sm">Configure Endpoints</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Add your inference server URL in the &quot;New Test&quot; tab. Auto-discover models or enter manually.
+            Make sure CORS is enabled on the server.
+          </p>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500 text-xs font-bold">2</span>
+            <span className="font-semibold text-sm">Run Benchmark</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Choose a prompt, token limit, repeat count, and concurrency levels.
+            Click &quot;Run Benchmark&quot; and watch live TTFT/TPS metrics.
+          </p>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-amber-500 text-xs font-bold">3</span>
+            <span className="font-semibold text-sm">Compare & Analyze</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Results auto-save. In &quot;History&quot;, select 2-4 sessions to compare
+            frameworks/models side by side with radar charts and bar charts.
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-md bg-muted/50 p-4">
+        <h5 className="font-semibold text-xs mb-3 text-muted-foreground uppercase tracking-wider">Learn more</h5>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <button
+            onClick={() => scrollTo('section-metrics')}
+            className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/80 transition-colors group"
+          >
+            <BarChart3 className="h-4 w-4 text-blue-500 shrink-0" />
+            <div>
+              <p className="text-xs font-semibold group-hover:text-blue-500 transition-colors">Metrics Guide</p>
+              <p className="text-[11px] text-muted-foreground">TTFT / TPS / ITL explained</p>
+            </div>
+          </button>
+          <button
+            onClick={() => scrollTo('section-cors')}
+            className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/80 transition-colors group"
+          >
+            <Globe className="h-4 w-4 text-emerald-500 shrink-0" />
+            <div>
+              <p className="text-xs font-semibold group-hover:text-emerald-500 transition-colors">CORS Guide</p>
+              <p className="text-[11px] text-muted-foreground">Fix cross-origin & local deploy</p>
+            </div>
+          </button>
+          <button
+            onClick={() => scrollTo('section-framework')}
+            className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5 text-left hover:bg-muted/80 transition-colors group"
+          >
+            <Cpu className="h-4 w-4 text-amber-500 shrink-0" />
+            <div>
+              <p className="text-xs font-semibold group-hover:text-amber-500 transition-colors">Frameworks</p>
+              <p className="text-[11px] text-muted-foreground">Ollama / llama.cpp / vLLM etc.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function MetricsGuideZh() {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-5">
-      <h4 className="text-base font-semibold mt-0">看什么指标、得到什么结论</h4>
       <p className="text-muted-foreground">
         本工具不评价模型"答得对不对"，只回答"跑得快不快、稳不稳"。
-        以下是每个指标的含义和使用场景。
+        以下按照从用户感知到深层分析的顺序，逐一说明每个指标。
       </p>
 
       <div className="space-y-4">
-        <div>
-          <h5 className="font-semibold text-sm">Cold Start TTFT -- 冷启动延迟</h5>
+        <div className="rounded-md border-l-2 border-blue-500/60 pl-4">
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
+            Cold Start TTFT -- 冷启动延迟
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             首次请求的首字延迟。对本地推理框架（Ollama / llama.cpp / MLX 等）尤为重要 --
             首次请求往往包含模型加载、GPU 权重搬运的时间，可达数秒甚至数十秒。
-            线上 API（如 OpenAI、Claude）通常没有明显冷启动。
             <strong> 如果你关注"打开聊天窗口后第一条消息要等多久"，这就是关键指标。</strong>
           </p>
           <table className="text-xs mt-2 w-full">
@@ -52,8 +246,11 @@ function MetricsGuideZh() {
           </table>
         </div>
 
-        <div>
-          <h5 className="font-semibold text-sm">TTFT -- 首字延迟 (Time to First Token)</h5>
+        <div className="rounded-md border-l-2 border-blue-500/60 pl-4">
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
+            TTFT -- 首字延迟 (Time to First Token)
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             从发送请求到收到第一个输出 token 的时间（ms）。
             反映 Prompt 处理（prefill）阶段的速度。
@@ -77,8 +274,11 @@ function MetricsGuideZh() {
           </table>
         </div>
 
-        <div>
-          <h5 className="font-semibold text-sm">TPS -- 输出速度 (Tokens Per Second)</h5>
+        <div className="rounded-md border-l-2 border-emerald-500/60 pl-4">
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            TPS -- 输出速度 (Tokens Per Second)
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             首个 token 到最后一个 token 之间的 decode 速率。
             分母不包含 TTFT，确保 prefill 和 decode 正交衡量。
@@ -101,8 +301,11 @@ function MetricsGuideZh() {
           </table>
         </div>
 
-        <div>
-          <h5 className="font-semibold text-sm">ITL P95 -- 输出平滑度 (Inter-Token Latency)</h5>
+        <div className="rounded-md border-l-2 border-emerald-500/60 pl-4">
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            ITL P95 -- 输出平滑度 (Inter-Token Latency)
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             相邻两个 token 之间的时间间隔。P95 意味着"95% 的 token 间隔在此值以内"。
             高 ITL P95 = 输出时有明显卡顿/跳跃，用户感知为"一顿一顿的"。
@@ -121,8 +324,11 @@ function MetricsGuideZh() {
           </table>
         </div>
 
-        <div>
-          <h5 className="font-semibold text-sm">并发扩展性 (Scalability)</h5>
+        <div className="rounded-md border-l-2 border-amber-500/60 pl-4">
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+            并发扩展性 (Scalability)
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             衡量模型在并发请求下的性能保持。计算方式为
             <code className="text-xs bg-muted px-1 rounded">TPS@concurrency=8 / TPS@concurrency=1</code>。
@@ -130,17 +336,22 @@ function MetricsGuideZh() {
           </p>
         </div>
 
-        <div>
-          <h5 className="font-semibold text-sm">响应稳定性 (Stability)</h5>
+        <div className="rounded-md border-l-2 border-amber-500/60 pl-4">
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+            响应稳定性 (Stability)
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
-            由两部分组成：70% 来自 TTFT 变异系数（CV = StdDev / Mean，越小越稳定），
-            30% 来自请求成功率。
+            主要基于 TTFT 变异系数（CV = StdDev / Mean，越小越稳定）。
             高稳定性 = 每次请求的延迟一致，不会"时好时坏"。
           </p>
         </div>
 
-        <div>
-          <h5 className="font-semibold text-sm">综合评分 (Overall Score)</h5>
+        <div className="rounded-md border-l-2 border-violet-500/60 pl-4">
+          <h5 className="font-semibold text-sm flex items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-violet-500" />
+            综合评分 (Overall Score)
+          </h5>
           <p className="text-muted-foreground text-xs mt-1">
             五个维度的算术平均值（0-100）。雷达图中越靠外表现越好。
             评分阈值参考 Apple Silicon M1-M4 系列芯片实测范围，作为经验基线。
@@ -175,23 +386,22 @@ function MetricsGuideZh() {
 function MetricsGuideEn() {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-5">
-      <h4 className="text-base font-semibold mt-0">Which metrics to look at and what conclusions to draw</h4>
       <p className="text-muted-foreground">
         This tool does not evaluate answer quality -- it only measures &quot;how fast and how stable&quot;.
+        Metrics are organized from user-perceived experience to deeper analysis.
       </p>
 
       <div className="space-y-4">
-        <div>
+        <div className="rounded-md border-l-2 border-blue-500/60 pl-4">
           <h5 className="font-semibold text-sm">Cold Start TTFT</h5>
           <p className="text-muted-foreground text-xs mt-1">
             TTFT of the very first request. Critical for local inference (Ollama / llama.cpp / MLX) --
             the first request often includes model loading and GPU weight transfer, adding seconds of latency.
-            Cloud APIs (OpenAI, Claude) typically have no noticeable cold start.
             <strong> If you care about &quot;how long until the first character after opening a chat&quot;, this is the key metric.</strong>
           </p>
         </div>
 
-        <div>
+        <div className="rounded-md border-l-2 border-blue-500/60 pl-4">
           <h5 className="font-semibold text-sm">TTFT -- Time to First Token</h5>
           <p className="text-muted-foreground text-xs mt-1">
             Time from request sent to first output token received (ms).
@@ -203,7 +413,7 @@ function MetricsGuideEn() {
           </p>
         </div>
 
-        <div>
+        <div className="rounded-md border-l-2 border-emerald-500/60 pl-4">
           <h5 className="font-semibold text-sm">TPS -- Tokens Per Second</h5>
           <p className="text-muted-foreground text-xs mt-1">
             Decode rate from first token to last. Denominator excludes TTFT so prefill and decode are orthogonal.
@@ -214,7 +424,7 @@ function MetricsGuideEn() {
           </p>
         </div>
 
-        <div>
+        <div className="rounded-md border-l-2 border-emerald-500/60 pl-4">
           <h5 className="font-semibold text-sm">ITL P95 -- Inter-Token Latency</h5>
           <p className="text-muted-foreground text-xs mt-1">
             Time between consecutive tokens. P95 means 95% of token gaps are within this value.
@@ -222,22 +432,22 @@ function MetricsGuideEn() {
           </p>
         </div>
 
-        <div>
+        <div className="rounded-md border-l-2 border-amber-500/60 pl-4">
           <h5 className="font-semibold text-sm">Scalability</h5>
           <p className="text-muted-foreground text-xs mt-1">
             TPS ratio at concurrency 8 vs 1. A ratio of 1.0 = perfect scaling; &le;0.15 = severe degradation.
           </p>
         </div>
 
-        <div>
+        <div className="rounded-md border-l-2 border-amber-500/60 pl-4">
           <h5 className="font-semibold text-sm">Stability</h5>
           <p className="text-muted-foreground text-xs mt-1">
-            70% from TTFT coefficient of variation (lower = more consistent),
-            30% from success rate. High stability = predictable response times.
+            Primarily based on TTFT coefficient of variation (lower = more consistent).
+            High stability = predictable response times.
           </p>
         </div>
 
-        <div>
+        <div className="rounded-md border-l-2 border-violet-500/60 pl-4">
           <h5 className="font-semibold text-sm">Overall Score</h5>
           <p className="text-muted-foreground text-xs mt-1">
             Arithmetic mean of five dimensions (0-100). Radar chart: farther out = better.
@@ -273,7 +483,6 @@ function MetricsGuideEn() {
 function CorsGuideZh() {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
-      <h4 className="text-base font-semibold mt-0">跨域 (CORS) 解决指南</h4>
       <p className="text-muted-foreground">
         LLM Bench 在浏览器中直接请求本地推理服务。由于浏览器安全策略（同源策略），
         当网页域名（如 <code className="text-xs">llm-bench.vercel.app</code>）与推理服务域名（如 <code className="text-xs">localhost:11434</code>）不同时，
@@ -367,7 +576,6 @@ function CorsGuideZh() {
 function CorsGuideEn() {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
-      <h4 className="text-base font-semibold mt-0">CORS Troubleshooting Guide</h4>
       <p className="text-muted-foreground">
         LLM Bench runs in the browser and directly requests your local inference server.
         Due to browser security (same-origin policy), requests from
@@ -437,7 +645,6 @@ function CorsGuideEn() {
 function FrameworkGuideZh() {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
-      <h4 className="text-base font-semibold mt-0">支持的本地推理框架</h4>
       <p className="text-muted-foreground">
         任何兼容 OpenAI <code className="text-xs">/v1/chat/completions</code> 流式接口的服务均可使用。
         以下是主流框架的特性对比，帮助你选择合适的推理方案。
@@ -519,7 +726,6 @@ function FrameworkGuideZh() {
 function FrameworkGuideEn() {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
-      <h4 className="text-base font-semibold mt-0">Supported Local Inference Frameworks</h4>
       <p className="text-muted-foreground">
         Any service compatible with the OpenAI <code className="text-xs">/v1/chat/completions</code> streaming API works.
       </p>
@@ -586,13 +792,33 @@ export function DocsGuide() {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <Section title={t('guideMetricsTitle')} defaultOpen>
+      <Section
+        id="section-quickstart"
+        title={t('guideQuickStartTitle')}
+        icon={<Zap className="h-4 w-4 text-amber-500" />}
+        defaultOpen
+      >
+        {isZh ? <QuickStartZh /> : <QuickStartEn />}
+      </Section>
+      <Section
+        id="section-metrics"
+        title={t('guideMetricsTitle')}
+        icon={<BarChart3 className="h-4 w-4 text-blue-500" />}
+      >
         {isZh ? <MetricsGuideZh /> : <MetricsGuideEn />}
       </Section>
-      <Section title={t('guideCorsTitle')}>
+      <Section
+        id="section-cors"
+        title={t('guideCorsTitle')}
+        icon={<Globe className="h-4 w-4 text-emerald-500" />}
+      >
         {isZh ? <CorsGuideZh /> : <CorsGuideEn />}
       </Section>
-      <Section title={t('guideFrameworkTitle')}>
+      <Section
+        id="section-framework"
+        title={t('guideFrameworkTitle')}
+        icon={<Cpu className="h-4 w-4 text-amber-500" />}
+      >
         {isZh ? <FrameworkGuideZh /> : <FrameworkGuideEn />}
       </Section>
     </div>

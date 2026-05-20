@@ -77,11 +77,13 @@ export function ResultDashboard({ session }: ResultDashboardProps) {
 
   const bestTps = Math.max(...session.results.map(r => r.singleConcurrency.tps.median))
   const bestTtft = Math.min(...session.results.map(r => r.singleConcurrency.ttft.median))
-  const avgSuccess = session.results.reduce((sum, r) => sum + r.singleConcurrency.successRate, 0) / session.results.length
   const hasColdStart = session.results.some(r => r.coldStartTtft != null)
   const maxColdStart = hasColdStart
     ? Math.max(...session.results.filter(r => r.coldStartTtft != null).map(r => r.coldStartTtft!))
     : null
+  const bestOverallScore = session.results
+    .filter(r => r.score)
+    .reduce((best, r) => Math.max(best, r.score!.overall), 0)
 
   return (
     <div className="space-y-6">
@@ -120,7 +122,6 @@ export function ResultDashboard({ session }: ResultDashboardProps) {
           </div>
         </div>
 
-        {/* 核心指标卡片 */}
         <div className={`grid gap-3 ${hasColdStart ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
           <div className="rounded-md bg-muted p-4">
             <p className="text-xs text-muted-foreground">{t('bestTtft')}</p>
@@ -145,12 +146,15 @@ export function ResultDashboard({ session }: ResultDashboardProps) {
               </p>
             </div>
           )}
-          <div className="rounded-md bg-muted p-4">
-            <p className="text-xs text-muted-foreground">{t('avgSuccess')}</p>
-            <p className="text-2xl font-semibold font-mono tabular-nums mt-1">
-              {avgSuccess.toFixed(0)}%
-            </p>
-          </div>
+          {bestOverallScore > 0 && (
+            <div className="rounded-md bg-muted p-4">
+              <p className="text-xs text-muted-foreground">{t('overallScore')}</p>
+              <p className="text-2xl font-semibold font-mono tabular-nums mt-1">
+                {bestOverallScore}
+                <span className="text-sm font-normal text-muted-foreground ml-1">/100</span>
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

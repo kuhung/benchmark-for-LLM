@@ -11,10 +11,15 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
 } from 'recharts'
-import { useI18n } from '@/lib/i18n'
+import { useI18n, TranslationKey } from '@/lib/i18n'
 
-const COLORS = ['#a3e635', '#38bdf8', '#f472b6', '#fb923c', '#a78bfa', '#e879f9', '#34d399', '#fbbf24']
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316']
 
 interface CompareViewProps {
   sessions: BenchmarkSession[]
@@ -51,9 +56,20 @@ const tooltipStyle = {
   fontSize: '12px',
 }
 
+const RADAR_DIMENSION_KEYS: { key: string; labelKey: TranslationKey }[] = [
+  { key: 'speed', labelKey: 'radarSpeed' },
+  { key: 'responsiveness', labelKey: 'radarResponse' },
+  { key: 'smoothness', labelKey: 'radarSmooth' },
+  { key: 'scalability', labelKey: 'radarScale' },
+  { key: 'stability', labelKey: 'radarStable' },
+]
+
 export function CompareView({ sessions }: CompareViewProps) {
   const { t, lang } = useI18n()
   const items = flattenResults(sessions, lang)
+
+  const hasRadarScores = items.some(({ result }) => result.score)
+  const hasColdStart = items.some(({ result }) => result.coldStartTtft != null)
 
   const ttftData = items.map(({ label, result, sessionIdx }) => ({
     name: label,
@@ -67,11 +83,39 @@ export function CompareView({ sessions }: CompareViewProps) {
     fill: COLORS[sessionIdx % COLORS.length],
   }))
 
-  const successData = items.map(({ label, result, sessionIdx }) => ({
+  const itlData = items.map(({ label, result, sessionIdx }) => ({
     name: label,
-    value: Number(result.singleConcurrency.successRate.toFixed(1)),
+    value: Number(result.singleConcurrency.itl.p95.toFixed(1)),
     fill: COLORS[sessionIdx % COLORS.length],
   }))
+
+  const e2eData = items.map(({ label, result, sessionIdx }) => ({
+    name: label,
+    value: Number(result.singleConcurrency.e2eLatency.median.toFixed(0)),
+    fill: COLORS[sessionIdx % COLORS.length],
+  }))
+
+  const coldStartData = hasColdStart
+    ? items
+        .filter(({ result }) => result.coldStartTtft != null)
+        .map(({ label, result, sessionIdx }) => ({
+          name: label,
+          value: Number(result.coldStartTtft!.toFixed(0)),
+          fill: COLORS[sessionIdx % COLORS.length],
+        }))
+    : []
+
+  const radarData = hasRadarScores
+    ? RADAR_DIMENSION_KEYS.map(dim => {
+        const entry: Record<string, string | number> = { dimension: t(dim.labelKey) }
+        items.forEach(({ label, result }) => {
+          if (result.score) {
+            entry[label] = result.score[dim.key as keyof typeof result.score]
+          }
+        })
+        return entry
+      })
+    : []
 
   return (
     <div className="space-y-6">
@@ -85,7 +129,7 @@ export function CompareView({ sessions }: CompareViewProps) {
             <span
               key={s.id}
               className="inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-mono"
-              style={{ backgroundColor: `${COLORS[i % COLORS.length]}20`, color: COLORS[i % COLORS.length] }}
+              style={{ backgroundColor: `${COLORS[i % COLORS.length]}15`, color: COLORS[i % COLORS.length] }}
             >
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
               {sessionLabel(s, lang)}
@@ -94,11 +138,82 @@ export function CompareView({ sessions }: CompareViewProps) {
         </div>
       </div>
 
+      {hasRadarScores && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex flex-col gap-1.5">
+              <span>{t('radarComparison')}</span>
+              <div className="flex flex-wrap gap-3">
+                {items.map(({ label, result }) => result.score && (
+                  <span key={label} className="text-xs font-normal text-muted-foreground font-mono">
+                    {label}: <span className="text-foreground font-semibold">{result.score.overall}</span>
+                  </span>
+                ))}
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={340}>
+              <RadarChart data={radarData}>
+                <PolarGrid stroke="var(--border)" gridType="polygon" />
+                <PolarAngleAxis
+                  dataKey="dimension"
+                  tick={{ fontSize: 11, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
+                />
+                <PolarRadiusAxis
+                  angle={90}
+                  domain={[0, 100]}
+                  tick={{ fontSize: 9, fontFamily: 'var(--font-mono)', fill: 'var(--muted-foreground)' }}
+                  axisLine={false}
+                />
+                {items.map(({ label, result, sessionIdx }) => result.score && (
+                  <Radar
+                    key={label}
+                    name={label}
+                    dataKey={label}
+                    stroke={COLORS[sessionIdx % COLORS.length]}
+                    fill={COLORS[sessionIdx % COLORS.length]}
+                    fillOpacity={0.15}
+                    strokeWidth={2}
+                  />
+                ))}
+                <Tooltip
+                  content={({ payload, label }) => {
+                    if (!payload || payload.length === 0) return null
+                    return (
+                      <div className="rounded-md border border-border bg-card px-3 py-2 shadow-lg text-xs font-mono">
+                        <p className="font-semibold mb-1.5">{label}</p>
+                        {payload.map((entry, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                            <span className="text-muted-foreground truncate max-w-[180px]">{entry.name}:</span>
+                            <span className="font-semibold tabular-nums">{String(entry.value)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  }}
+                />
+                <Legend wrapperStyle={{ fontFamily: 'var(--font-mono)', fontSize: '10px', opacity: 0.7 }} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <CompareBarChart title={t('ttftComparison')} data={ttftData} />
         <CompareBarChart title={t('tpsComparison')} data={tpsData} />
       </div>
-      <CompareBarChart title={t('successRate')} data={successData} />
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <CompareBarChart title={t('itlComparison')} data={itlData} />
+        <CompareBarChart title={t('e2eComparison')} data={e2eData} />
+      </div>
+
+      {hasColdStart && coldStartData.length > 0 && (
+        <CompareBarChart title={t('coldStartComparison')} data={coldStartData} />
+      )}
 
       <div className="rounded-lg border border-border bg-card overflow-hidden">
         <div className="px-5 py-3 border-b border-border">
@@ -115,7 +230,7 @@ export function CompareView({ sessions }: CompareViewProps) {
                 <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('tpsP50')}</th>
                 <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('itlP95')}</th>
                 <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('e2eP50')}</th>
-                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('success')}</th>
+                <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">{t('score')}</th>
               </tr>
             </thead>
             <tbody>
@@ -139,7 +254,9 @@ export function CompareView({ sessions }: CompareViewProps) {
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.tps.median.toFixed(1)}</td>
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.itl.p95.toFixed(1)}</td>
                   <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.e2eLatency.median.toFixed(0)}</td>
-                  <td className="px-3 py-3 text-right tabular-nums">{result.singleConcurrency.successRate.toFixed(0)}%</td>
+                  <td className="px-3 py-3 text-right tabular-nums font-semibold">
+                    {result.score ? result.score.overall : '-'}
+                  </td>
                 </tr>
               ))}
             </tbody>

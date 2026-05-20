@@ -139,9 +139,16 @@ export const translations = {
 
   // Guide / Docs
   guide: { en: 'Guide', zh: '使用指南' },
+  guideQuickStartTitle: { en: 'Quick Start', zh: '快速上手' },
   guideMetricsTitle: { en: 'Metrics Guide', zh: '指标说明' },
   guideCorsTitle: { en: 'CORS Guide', zh: '跨域解决指南' },
   guideFrameworkTitle: { en: 'Supported Frameworks', zh: '支持的推理框架' },
+
+  // Compare View - additional metrics
+  itlComparison: { en: 'ITL P95 Comparison (ms)', zh: '字间延迟对比 / ITL P95 (ms)' },
+  e2eComparison: { en: 'E2E Latency Comparison (ms)', zh: '端到端延迟对比 / E2E (ms)' },
+  coldStartComparison: { en: 'Cold Start Comparison (ms)', zh: '冷启动延迟对比 (ms)' },
+  radarComparison: { en: 'Radar Score Comparison', zh: '雷达评分对比' },
 
   // History / session info
   promptLabel: { en: 'Prompt', zh: '提示词' },
