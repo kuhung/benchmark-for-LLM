@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """LLM Inference Benchmark - CLI entry point.
 
-输出标准 JSON 格式，兼容 Web 端导入查看图表。
-适用场景：CORS 无法配置、无头服务器 SSH 环境、CI/CD 集成。
+Outputs standard JSON format compatible with the web dashboard.
+Use cases: CORS not configured, headless SSH servers, CI/CD integration.
 """
 
 import argparse
@@ -19,7 +19,10 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
 from rich.table import Table
 
+from llm_benchmark_runner.i18n import get_locale, t
+
 console = Console()
+_locale: str = "en"
 
 
 @dataclass
@@ -205,8 +208,9 @@ async def run_single_benchmark(
                 except json.JSONDecodeError:
                     pass
                 if not token_timestamps:
-                    error_msg = f"No content chunks extracted. Raw response: {raw_output[:500] or '<empty>'}"
-                    console.print(f"[yellow]Warning: {error_msg}[/yellow]")
+                    raw_snippet = raw_output[:500] or "<empty>"
+                    error_msg = t("warn.no_content", _locale, raw=raw_snippet)
+                    console.print(f"[yellow]{error_msg}[/yellow]")
                     return RawResult(
                         endpoint_id=endpoint.id,
                         request_start=request_start,
@@ -389,6 +393,8 @@ async def benchmark_endpoint(
 
 
 async def async_main():
+    global _locale
+
     parser = argparse.ArgumentParser(
         prog="llm-benchmark",
         description="LLM Inference Benchmark CLI - measure TTFT, TPS, ITL, E2E latency",
@@ -402,8 +408,11 @@ async def async_main():
     parser.add_argument("--repeat", type=int, default=5, help="Repeat count per concurrency level")
     parser.add_argument("--concurrency", default="1,2,4,8", help="Comma-separated concurrency levels")
     parser.add_argument("--output", default=None, help="Output JSON file path")
+    parser.add_argument("--lang", default=None, choices=["en", "zh"], help="Output language (en/zh, default: auto-detect)")
     parser.add_argument("--version", action="version", version=f"%(prog)s {_get_version()}")
     args = parser.parse_args()
+
+    _locale = get_locale(args.lang)
 
     concurrency_levels = [int(x) for x in args.concurrency.split(",")]
     total_tasks = len(concurrency_levels) * args.repeat
@@ -416,11 +425,11 @@ async def async_main():
         api_key=args.api_key,
     )
 
-    console.print(f"\n[bold]LLM Inference Benchmark[/bold]")
-    console.print(f"  Endpoint: {endpoint.name}")
-    console.print(f"  Model: {endpoint.model_id}")
-    console.print(f"  Repeat: {args.repeat} | Concurrency: {args.concurrency}")
-    console.print(f"  Max Tokens: {args.max_tokens}\n")
+    console.print(f"\n[bold]{t('header.title', _locale)}[/bold]")
+    console.print(f"  {t('header.endpoint', _locale)}: {endpoint.name}")
+    console.print(f"  {t('header.model', _locale)}: {endpoint.model_id}")
+    console.print(f"  {t('header.repeat', _locale)}: {args.repeat} | {t('header.concurrency', _locale)}: {args.concurrency}")
+    console.print(f"  {t('header.max_tokens', _locale)}: {args.max_tokens}\n")
 
     with Progress(
         SpinnerColumn(),
@@ -430,14 +439,17 @@ async def async_main():
         TimeElapsedColumn(),
         console=console,
     ) as progress:
-        task = progress.add_task(f"Benchmarking {endpoint.name}", total=total_tasks)
+        task = progress.add_task(
+            t("progress.benchmarking", _locale, name=endpoint.name),
+            total=total_tasks,
+        )
         result = await benchmark_endpoint(
             endpoint, args.prompt, args.max_tokens, args.repeat, concurrency_levels, progress, task
         )
 
-    table = Table(title="Results Summary")
-    table.add_column("Metric", style="cyan")
-    table.add_column("Value", justify="right")
+    table = Table(title=t("results.title", _locale))
+    table.add_column(t("results.metric", _locale), style="cyan")
+    table.add_column(t("results.value", _locale), justify="right")
 
     sm = result["singleConcurrency"]
     table.add_row("TTFT P50", f"{sm['ttft']['median']:.0f} ms")
@@ -452,7 +464,8 @@ async def async_main():
     table.add_row("Score - Smoothness", f"{result['score']['smoothness']}")
     table.add_row("Score - Scalability", f"{result['score']['scalability']}")
     table.add_row("Score - Stability", f"{result['score']['stability']}")
-    table.add_row("[bold]Score - Overall[/bold]", f"[bold]{result['score']['overall']}[/bold]")
+    score_label = f"[bold]{t('results.score_overall', _locale)}[/bold]"
+    table.add_row(score_label, f"[bold]{result['score']['overall']}[/bold]")
     console.print(table)
 
     session = {
@@ -469,8 +482,8 @@ async def async_main():
 
     output_path = args.output or f"benchmark-{time.strftime('%Y%m%d-%H%M%S')}.json"
     Path(output_path).write_text(json.dumps(session, indent=2, default=str))
-    console.print(f"\n[green]Results saved to: {output_path}[/green]")
-    console.print("[dim]Import this file into the web dashboard to view charts.[/dim]\n")
+    console.print(f"\n[green]{t('output.saved', _locale, path=output_path)}[/green]")
+    console.print(f"[dim]{t('output.import_hint', _locale)}[/dim]\n")
 
 
 def _get_version() -> str:
