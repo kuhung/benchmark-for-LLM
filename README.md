@@ -17,11 +17,11 @@
 </p>
 
 <p align="center">
-  <a href="#-quick-start">Quick Start</a> &bull;
-  <a href="#-features">Features</a> &bull;
-  <a href="#-python-cli">Python CLI</a> &bull;
-  <a href="#-metrics">Metrics</a> &bull;
-  <a href="#-roadmap">Roadmap</a> &bull;
+  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#features">Features</a> &bull;
+  <a href="#python-cli">Python CLI</a> &bull;
+  <a href="#metrics">Metrics</a> &bull;
+  <a href="#roadmap">Roadmap</a> &bull;
   <a href="#readme-cn">中文文档</a>
 </p>
 
@@ -265,11 +265,11 @@ cd runner && pip install -e .
 </p>
 
 <p align="center">
-  <a href="#-快速开始">快速开始</a> &bull;
-  <a href="#-核心功能">核心功能</a> &bull;
-  <a href="#-python-命令行">Python 命令行</a> &bull;
-  <a href="#-指标体系">指标体系</a> &bull;
-  <a href="#-路线图">路线图</a> &bull;
+  <a href="#快速开始">快速开始</a> &bull;
+  <a href="#核心功能">核心功能</a> &bull;
+  <a href="#python-命令行">Python 命令行</a> &bull;
+  <a href="#指标体系">指标体系</a> &bull;
+  <a href="#路线图">路线图</a> &bull;
   <a href="#why-llm-benchmark">English</a>
 </p>
 
