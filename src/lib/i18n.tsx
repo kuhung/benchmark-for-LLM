@@ -149,7 +149,6 @@ export const translations = {
   guideMetricsTitle: { en: 'Metrics Guide', zh: '指标说明' },
   guideCorsTitle: { en: 'CORS Guide', zh: '跨域解决指南' },
   guideFrameworkTitle: { en: 'Supported Frameworks', zh: '支持的推理框架' },
-  guideFaqTitle: { en: 'FAQ', zh: '常见问题' },
 
   // Compare View - additional metrics
   itlComparison: { en: 'ITL P95 Comparison (ms)', zh: '字间延迟对比 / ITL P95 (ms)' },
