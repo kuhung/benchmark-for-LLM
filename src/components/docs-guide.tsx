@@ -557,7 +557,7 @@ function CorsGuideZh() {
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
       <p className="text-muted-foreground">
         LLM Bench 在浏览器中直接请求本地推理服务。由于浏览器安全策略（同源策略），
-        当网页域名（如 <code className="text-xs">llm-bench.vercel.app</code>）与推理服务域名（如 <code className="text-xs">localhost:11434</code>）不同时，
+        当网页域名（如 <code className="text-xs">benchmark-for-llm.kuhung.me</code>）与推理服务域名（如 <code className="text-xs">localhost:11434</code>）不同时，
         请求会被 CORS 策略阻止。以下是三种解决方案。
       </p>
 
@@ -651,7 +651,7 @@ function CorsGuideEn() {
       <p className="text-muted-foreground">
         LLM Bench runs in the browser and directly requests your local inference server.
         Due to browser security (same-origin policy), requests from
-        <code className="text-xs"> llm-bench.vercel.app</code> to <code className="text-xs">localhost:11434</code>
+        <code className="text-xs"> benchmark-for-llm.kuhung.me</code> to <code className="text-xs">localhost:11434</code>
         are blocked unless CORS is configured. Three solutions:
       </p>
 

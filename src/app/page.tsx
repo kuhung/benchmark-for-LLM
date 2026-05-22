@@ -16,7 +16,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { LangToggle } from '@/components/lang-toggle'
 import { Button } from '@/components/ui/button'
 import { DocsGuide } from '@/components/docs-guide'
-import { Play, RotateCcw, Clock, Gauge, Loader2, BookOpen } from 'lucide-react'
+import { Play, RotateCcw, Clock, Gauge, Loader2, BookOpen, Github } from 'lucide-react'
 import { useI18n } from '@/lib/i18n'
 
 export default function Home() {
@@ -157,6 +157,21 @@ export default function Home() {
             </div>
             <LangToggle />
             <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="h-8 w-8 px-0"
+            >
+              <a
+                href="https://github.com/kuhung/benchmark-for-LLM"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="h-[1.2rem] w-[1.2rem]" />
+                <span className="sr-only">GitHub</span>
+              </a>
+            </Button>
           </div>
         </div>
       </header>

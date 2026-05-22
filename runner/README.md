@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/llm-benchmark-runner.svg)](https://pypi.org/project/llm-benchmark-runner/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-CLI tool for LLM inference performance benchmarking — measures TTFT / TPS / ITL / E2E latency. Outputs standard JSON importable into the [web dashboard](https://benchmark-for-llm.vercel.app) for interactive charts and radar scores.
+CLI tool for LLM inference performance benchmarking — measures TTFT / TPS / ITL / E2E latency. Outputs standard JSON importable into the [web dashboard](https://benchmark-for-llm.kuhung.me) for interactive charts and radar scores.
 
 Designed for scenarios where the browser can't reach the API (CORS not configured, headless SSH servers, CI/CD pipelines).
 
@@ -83,7 +83,7 @@ The JSON output follows the `BenchmarkSession` schema, containing:
 
 The JSON output is directly compatible with the web dashboard:
 
-1. Open [benchmark-for-llm.vercel.app](https://benchmark-for-llm.vercel.app)
+1. Open [benchmark-for-llm.kuhung.me](https://benchmark-for-llm.kuhung.me)
 2. Switch to the **History** tab
 3. Click **Import**
 4. Select the CLI output JSON file
@@ -113,7 +113,7 @@ MIT
 
 # llm-benchmark-runner (中文)
 
-LLM 推理性能测评 CLI 工具 -- 测量 TTFT / TPS / ITL / E2E 延迟，输出标准 JSON 可直接导入 [Web 端](https://benchmark-for-llm.vercel.app) 查看可视化图表。
+LLM 推理性能测评 CLI 工具 -- 测量 TTFT / TPS / ITL / E2E 延迟，输出标准 JSON 可直接导入 [Web 端](https://benchmark-for-llm.kuhung.me) 查看可视化图表。
 
 适用于浏览器无法触达的场景（CORS 未配置、无头服务器 SSH 环境、CI/CD 集成等）。
 

@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://benchmark-for-llm.vercel.app"><img src="https://img.shields.io/badge/Try_it_live-blue?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo"></a>
+  <a href="https://benchmark-for-llm.kuhung.me"><img src="https://img.shields.io/badge/Try_it_live-blue?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo"></a>
   <a href="https://pypi.org/project/llm-benchmark-runner/"><img src="https://img.shields.io/pypi/v/llm-benchmark-runner?style=for-the-badge&logo=pypi&logoColor=white&label=PyPI" alt="PyPI"></a>
 </p>
 
@@ -33,7 +33,7 @@ You can check your internet speed on [fast.com](https://fast.com) in seconds. **
 
 LLM Benchmark is a lightweight inference performance testing tool for local and remote LLM deployments. Unlike heavy evaluation frameworks (lm-evaluation-harness, etc.), it doesn't care *what* your model says — only *how fast and stable* it says it.
 
-- **Zero install** — open the [web app](https://benchmark-for-llm.vercel.app), paste your API endpoint, click "Run". Done.
+- **Zero install** — open the [web app](https://benchmark-for-llm.kuhung.me), paste your API endpoint, click "Run". Done.
 - **Privacy first** — benchmarks run entirely in your browser. API keys never leave your machine.
 - **Universal** — works with any OpenAI-compatible API: Ollama, vLLM, llama.cpp, LM Studio, MLX, remote APIs, and more.
 - **CLI companion** — for headless servers and CI/CD, `pip install llm-benchmark-runner` gives you the same metrics from the terminal, with JSON output importable into the web dashboard.
@@ -42,7 +42,7 @@ LLM Benchmark is a lightweight inference performance testing tool for local and 
 
 ### Web (recommended)
 
-1. Open **[benchmark-for-llm.vercel.app](https://benchmark-for-llm.vercel.app)**
+1. Open **[benchmark-for-llm.kuhung.me](https://benchmark-for-llm.kuhung.me)**
 2. Add your endpoint (auto-discovers local Ollama / LM Studio if running)
 3. Click **Start Benchmark**
 4. View results: radar score, charts, and raw data
@@ -260,7 +260,7 @@ cd runner && pip install -e .
 </p>
 
 <p align="center">
-  <a href="https://benchmark-for-llm.vercel.app"><img src="https://img.shields.io/badge/在线体验-blue?style=for-the-badge&logo=vercel&logoColor=white" alt="在线体验"></a>
+  <a href="https://benchmark-for-llm.kuhung.me"><img src="https://img.shields.io/badge/在线体验-blue?style=for-the-badge&logo=vercel&logoColor=white" alt="在线体验"></a>
   <a href="https://pypi.org/project/llm-benchmark-runner/"><img src="https://img.shields.io/pypi/v/llm-benchmark-runner?style=for-the-badge&logo=pypi&logoColor=white&label=PyPI" alt="PyPI"></a>
 </p>
 
@@ -281,7 +281,7 @@ cd runner && pip install -e .
 
 LLM Benchmark 是一个面向本地/远程 LLM 部署的轻量级推理性能测评工具。不同于 lm-evaluation-harness 等重型评测框架，它不关心模型"答得对不对"，只关心"跑得快不快、稳不稳"。
 
-- **零安装** — 打开[网页](https://benchmark-for-llm.vercel.app)，填入 API 地址，点击测评，看结果。就这么简单。
+- **零安装** — 打开[网页](https://benchmark-for-llm.kuhung.me)，填入 API 地址，点击测评，看结果。就这么简单。
 - **隐私安全** — Benchmark 在浏览器中运行，API Key 等敏感信息不离开你的设备。
 - **广泛兼容** — 支持所有 OpenAI 兼容 API：Ollama、vLLM、llama.cpp、LM Studio、MLX 等。
 - **CLI 补充** — 对于无头服务器和 CI/CD 场景，`pip install llm-benchmark-runner` 提供相同的指标采集能力，JSON 输出可导入网页端查看图表。
@@ -290,7 +290,7 @@ LLM Benchmark 是一个面向本地/远程 LLM 部署的轻量级推理性能测
 
 ### 网页端（推荐）
 
-1. 打开 **[benchmark-for-llm.vercel.app](https://benchmark-for-llm.vercel.app)**
+1. 打开 **[benchmark-for-llm.kuhung.me](https://benchmark-for-llm.kuhung.me)**
 2. 添加端点（会自动发现本地运行的 Ollama / LM Studio）
 3. 点击 **开始测评**
 4. 查看结果：雷达评分、图表、原始数据

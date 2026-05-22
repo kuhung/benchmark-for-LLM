@@ -36,7 +36,7 @@ dependencies = [
 Homepage = "https://github.com/kuhung/benchmark-for-LLM"
 Repository = "https://github.com/kuhung/benchmark-for-LLM"
 Issues = "https://github.com/kuhung/benchmark-for-LLM/issues"
-"Live Demo" = "https://benchmark-for-llm.vercel.app"
+"Live Demo" = "https://benchmark-for-llm.kuhung.me"
 
 [project.scripts]
 llm-benchmark = "llm_benchmark_runner.cli:main"
