@@ -109,7 +109,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2.5">
             <Gauge className="h-5 w-5 text-primary" />
-            <span className="text-sm font-semibold tracking-wide">LLM Bench</span>
+            <h1 className="text-sm font-semibold tracking-wide">LLM Inference Benchmark</h1>
             {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA && (
               <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                 {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA.slice(0, 7)}
@@ -181,6 +181,10 @@ export default function Home() {
           <>
             {!session && (
               <div className="space-y-6 animate-fade-in">
+                <p className="text-sm text-muted-foreground max-w-3xl">
+                  {t('heroDescription')}
+                </p>
+
                 {/* Step 1: 端点配置 -- 用户首先需要知道测什么 */}
                 <section>
                   {isDiscovering ? (

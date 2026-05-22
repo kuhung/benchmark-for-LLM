@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useI18n } from '@/lib/i18n'
-import { ChevronDown, Zap, BarChart3, Globe, Cpu } from 'lucide-react'
+import { ChevronDown, Zap, BarChart3, Globe, Cpu, HelpCircle } from 'lucide-react'
 
 function Section({ id, title, icon, defaultOpen, children }: {
   id: string
@@ -872,6 +872,100 @@ function FrameworkGuideEn() {
   )
 }
 
+function FaqZh() {
+  return (
+    <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
+      <div className="space-y-4">
+        <div>
+          <h5 className="font-semibold text-sm">什么是 TTFT (Time to First Token)？</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            TTFT 即"首字延迟"，衡量从发送请求到收到第一个输出 token 的耗时（毫秒）。
+            它反映了 Prompt 处理（prefill）阶段的速度。低于 200ms 感觉即时，200-500ms 可接受，超过 1 秒会有明显等待感。
+          </p>
+        </div>
+        <div>
+          <h5 className="font-semibold text-sm">什么是 TPS (Tokens Per Second)？</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            TPS 即"输出速度"，衡量从首 token 到末 token 的解码速率。人类阅读速度约 4 t/s，
+            流畅对话体验需要 30+ t/s，Apple M4 Max 本地推理可达 60-80 t/s。
+          </p>
+        </div>
+        <div>
+          <h5 className="font-semibold text-sm">支持哪些推理框架？</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            任何兼容 OpenAI <code className="text-xs">/v1/chat/completions</code> 流式接口的服务均可使用，
+            包括 <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Ollama</a>、
+            <a href="https://lmstudio.ai" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">LM Studio</a>、
+            llama.cpp、vLLM 和 MLX LM。
+          </p>
+        </div>
+        <div>
+          <h5 className="font-semibold text-sm">遇到 CORS 跨域问题怎么办？</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            三种解决方案：(1) 在推理框架中开启 CORS，如 <code className="text-xs">OLLAMA_ORIGINS="*" ollama serve</code>；
+            (2) 克隆本项目到本地运行 <code className="text-xs">npm run dev</code>；
+            (3) 使用 Python CLI Runner 完全绕过浏览器。详见上方"跨域解决指南"。
+          </p>
+        </div>
+        <div>
+          <h5 className="font-semibold text-sm">数据保存在哪里？</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            所有测试数据保存在浏览器本地的 IndexedDB 中，不会上传到任何服务器。
+            你可以通过"历史记录"导出/导入 JSON 文件进行跨设备迁移。
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function FaqEn() {
+  return (
+    <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
+      <div className="space-y-4">
+        <div>
+          <h5 className="font-semibold text-sm">What is TTFT (Time to First Token)?</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            TTFT measures the time from sending a request to receiving the first output token (in milliseconds).
+            It reflects prompt processing (prefill) speed. Under 200ms feels instant, 200-500ms is acceptable, over 1 second causes noticeable delay.
+          </p>
+        </div>
+        <div>
+          <h5 className="font-semibold text-sm">What is TPS (Tokens Per Second)?</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            TPS is the decode rate from the first token to the last. Human reading speed is about 4 t/s,
+            a fluent chat experience needs 30+ t/s, and Apple M4 Max local inference can reach 60-80 t/s.
+          </p>
+        </div>
+        <div>
+          <h5 className="font-semibold text-sm">Which LLM inference frameworks are supported?</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            Any service compatible with the OpenAI <code className="text-xs">/v1/chat/completions</code> streaming API works,
+            including <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Ollama</a>,{' '}
+            <a href="https://lmstudio.ai" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">LM Studio</a>,
+            llama.cpp, vLLM, and MLX LM.
+          </p>
+        </div>
+        <div>
+          <h5 className="font-semibold text-sm">How do I fix CORS issues?</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            Three solutions: (1) Enable CORS on the inference server, e.g. <code className="text-xs">OLLAMA_ORIGINS="*" ollama serve</code>;
+            (2) Clone and run locally with <code className="text-xs">npm run dev</code>;
+            (3) Use the Python CLI runner to bypass the browser entirely. See the CORS Guide section above for details.
+          </p>
+        </div>
+        <div>
+          <h5 className="font-semibold text-sm">Where is my data stored?</h5>
+          <p className="text-muted-foreground text-xs mt-1">
+            All benchmark data is stored in your browser&apos;s IndexedDB -- nothing is uploaded to any server.
+            You can export/import JSON files from the History tab for cross-device migration.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function DocsGuide() {
   const { lang, t } = useI18n()
   const isZh = lang === 'zh'
@@ -907,6 +1001,51 @@ export function DocsGuide() {
       >
         {isZh ? <FrameworkGuideZh /> : <FrameworkGuideEn />}
       </Section>
+      <Section
+        id="section-faq"
+        title={t('guideFaqTitle')}
+        icon={<HelpCircle className="h-4 w-4 text-violet-500" />}
+      >
+        {isZh ? <FaqZh /> : <FaqEn />}
+      </Section>
+
+      <nav className="rounded-lg border border-border bg-card p-4" aria-label="Related links">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+          {isZh ? '相关链接' : 'Related Links'}
+        </h3>
+        <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+          <li>
+            <a
+              href="https://github.com/kuhung/benchmark-for-LLM"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              GitHub Repository
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://pypi.org/project/llm-inference-benchmark/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Python CLI (PyPI)
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://kuhung.me"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              {isZh ? '作者博客' : "Author's Blog"}
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   )
 }

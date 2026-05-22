@@ -137,12 +137,19 @@ export const translations = {
   coldStartTtftDesc: { en: 'TTFT of the very first request — includes model loading for local inference', zh: '首次请求的首字延迟 -- 本地推理时包含模型加载耗时' },
   coldStartOverhead: { en: 'Cold Start Overhead', zh: '冷启动开销' },
 
+  // Hero description for SEO
+  heroDescription: {
+    en: 'Measure LLM inference performance directly in your browser. Compare TTFT, TPS, ITL, and concurrency scaling across Ollama, vLLM, llama.cpp, LM Studio, and MLX -- no installation required.',
+    zh: '在浏览器中直接测量 LLM 推理性能。对比 Ollama、vLLM、llama.cpp、LM Studio、MLX 等框架的首字延迟 (TTFT)、输出速度 (TPS)、字间延迟 (ITL) 及并发扩展性 -- 无需额外安装。',
+  },
+
   // Guide / Docs
   guide: { en: 'Guide', zh: '使用指南' },
   guideQuickStartTitle: { en: 'Quick Start', zh: '快速上手' },
   guideMetricsTitle: { en: 'Metrics Guide', zh: '指标说明' },
   guideCorsTitle: { en: 'CORS Guide', zh: '跨域解决指南' },
   guideFrameworkTitle: { en: 'Supported Frameworks', zh: '支持的推理框架' },
+  guideFaqTitle: { en: 'FAQ', zh: '常见问题' },
 
   // Compare View - additional metrics
   itlComparison: { en: 'ITL P95 Comparison (ms)', zh: '字间延迟对比 / ITL P95 (ms)' },
