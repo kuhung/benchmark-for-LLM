@@ -108,7 +108,7 @@ const faqJsonLd = {
       name: 'How do I fix CORS issues when benchmarking local servers?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Enable CORS on your inference server (e.g., OLLAMA_ORIGINS="*" ollama serve), run LLM Bench locally via npm run dev, or use the Python CLI runner to bypass the browser entirely.',
+        text: 'Enable CORS on your inference server (e.g., OLLAMA_ORIGINS="*" ollama serve), run LLM Inference Benchmark locally via npm run dev, or use the Python CLI runner to bypass the browser entirely.',
       },
     },
   ],

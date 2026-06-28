@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">LLM Benchmark</h1>
+  <h1 align="center">LLM Inference Benchmark</h1>
   <p align="center">
     <strong>fast.com for LLM inference</strong> — measure how fast your LLM API really is
   </p>
@@ -27,11 +27,11 @@
 
 ---
 
-## Why LLM Benchmark?
+## Why LLM Inference Benchmark?
 
 You can check your internet speed on [fast.com](https://fast.com) in seconds. **Why can't you do the same for your LLM API?**
 
-LLM Benchmark is a lightweight inference performance testing tool for local and remote LLM deployments. Unlike heavy evaluation frameworks (lm-evaluation-harness, etc.), it doesn't care *what* your model says — only *how fast and stable* it says it.
+LLM Inference Benchmark is a lightweight inference performance testing tool for local and remote LLM deployments. Unlike heavy evaluation frameworks (lm-evaluation-harness, etc.), it doesn't care *what* your model says — only *how fast and stable* it says it.
 
 - **Zero install** — open the [web app](https://benchmark-for-llm.kuhung.me), paste your API endpoint, click "Run". Done.
 - **Privacy first** — benchmarks run entirely in your browser. API keys never leave your machine.
@@ -253,7 +253,7 @@ cd runner && pip install -e .
 <a id="readme-cn"></a>
 
 <p align="center">
-  <h1 align="center">LLM Benchmark</h1>
+  <h1 align="center">LLM Inference Benchmark</h1>
   <p align="center">
     <strong>LLM 推理测速工具</strong> — 像 fast.com 测网速一样，测你的 LLM API 到底有多快
   </p>
@@ -275,11 +275,11 @@ cd runner && pip install -e .
 
 ---
 
-## 为什么需要 LLM Benchmark?
+## 为什么需要 LLM Inference Benchmark?
 
 [fast.com](https://fast.com) 让你几秒钟就能测网速。**为什么 LLM API 不能这样测？**
 
-LLM Benchmark 是一个面向本地/远程 LLM 部署的轻量级推理性能测评工具。不同于 lm-evaluation-harness 等重型评测框架，它不关心模型"答得对不对"，只关心"跑得快不快、稳不稳"。
+LLM Inference Benchmark 是一个面向本地/远程 LLM 部署的轻量级推理性能测评工具。不同于 lm-evaluation-harness 等重型评测框架，它不关心模型"答得对不对"，只关心"跑得快不快、稳不稳"。
 
 - **零安装** — 打开[网页](https://benchmark-for-llm.kuhung.me)，填入 API 地址，点击测评，看结果。就这么简单。
 - **隐私安全** — Benchmark 在浏览器中运行，API Key 等敏感信息不离开你的设备。

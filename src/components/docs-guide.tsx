@@ -46,7 +46,7 @@ function QuickStartZh() {
       <div>
         <h4 className="text-base font-semibold mt-0">三步开始测试</h4>
         <p className="text-muted-foreground text-sm mt-1">
-          LLM Bench 在浏览器中直接测量本地推理服务的性能 -- 无需安装额外软件。
+          LLM Inference Benchmark 在浏览器中直接测量本地推理服务的性能 -- 无需安装额外软件。
         </p>
       </div>
 
@@ -137,7 +137,7 @@ function QuickStartEn() {
       <div>
         <h4 className="text-base font-semibold mt-0">Get started in 3 steps</h4>
         <p className="text-muted-foreground text-sm mt-1">
-          LLM Bench measures local inference performance directly in the browser -- no extra software required.
+          LLM Inference Benchmark measures local inference performance directly in the browser -- no extra software required.
         </p>
       </div>
 
@@ -556,7 +556,7 @@ function CorsGuideZh() {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
       <p className="text-muted-foreground">
-        LLM Bench 在浏览器中直接请求本地推理服务。由于浏览器安全策略（同源策略），
+        LLM Inference Benchmark 在浏览器中直接请求本地推理服务。由于浏览器安全策略（同源策略），
         当网页域名（如 <code className="text-xs">benchmark-for-llm.kuhung.me</code>）与推理服务域名（如 <code className="text-xs">localhost:11434</code>）不同时，
         请求会被 CORS 策略阻止。以下是三种解决方案。
       </p>
@@ -611,7 +611,7 @@ function CorsGuideZh() {
       </div>
 
       <div>
-        <h5 className="font-semibold text-sm">方案二：本地部署 LLM Bench</h5>
+        <h5 className="font-semibold text-sm">方案二：本地部署 LLM Inference Benchmark</h5>
         <p className="text-muted-foreground text-xs mt-1">
           将本项目克隆到本地，让网页和推理服务在同一网络下运行，天然绕过 CORS：
         </p>
@@ -649,7 +649,7 @@ function CorsGuideEn() {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
       <p className="text-muted-foreground">
-        LLM Bench runs in the browser and directly requests your local inference server.
+        LLM Inference Benchmark runs in the browser and directly requests your local inference server.
         Due to browser security (same-origin policy), requests from
         <code className="text-xs"> benchmark-for-llm.kuhung.me</code> to <code className="text-xs">localhost:11434</code>
         are blocked unless CORS is configured. Three solutions:
@@ -704,7 +704,7 @@ function CorsGuideEn() {
       </div>
 
       <div>
-        <h5 className="font-semibold text-sm">Option 2: Run LLM Bench locally</h5>
+        <h5 className="font-semibold text-sm">Option 2: Run LLM Inference Benchmark locally</h5>
         <p className="text-muted-foreground text-xs mt-1">
           Clone and run locally -- same origin, no CORS issues:
         </p>
@@ -802,7 +802,7 @@ function FrameworkGuideZh() {
           Ollama 和 LM Studio 会缓存已加载模型（热加载），
           但切换模型或长时间未使用后仍需重新加载。
           相比之下，线上 API（OpenAI / Claude / Gemini）的冷启动通常不可感知。
-          LLM Bench 的"冷启动延迟"指标正是用于量化这一差异。
+          LLM Inference Benchmark 的"冷启动延迟"指标正是用于量化这一差异。
         </p>
       </div>
     </div>

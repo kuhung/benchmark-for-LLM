@@ -1,4 +1,4 @@
-# LLM Bench -- 产品路线图 PRD
+# LLM Inference Benchmark -- 产品路线图 PRD
 
 > 版本: v1.1 | 更新日期: 2026-05-15
 >
