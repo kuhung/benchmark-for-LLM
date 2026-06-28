@@ -102,6 +102,7 @@ export type BenchmarkStatus = 'idle' | 'running' | 'completed' | 'cancelled' | '
 
 export interface BenchmarkProgress {
   status: BenchmarkStatus
+  errorMessage?: string
   currentEndpoint?: string
   currentRound?: number
   totalRounds?: number

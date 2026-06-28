@@ -20,6 +20,11 @@ export const translations = {
   // Header
   newTest: { en: 'New Test', zh: '新建测试' },
   history: { en: 'History', zh: '历史记录' },
+  backToHistory: { en: 'Back to History', zh: '返回历史记录' },
+  runAnother: { en: 'Run Another Test', zh: '再测一次' },
+  viewingResult: { en: 'Viewing Result', zh: '查看结果' },
+  corsHint: { en: 'Testing a local server? Make sure CORS is enabled —', zh: '测试本地服务？请先确认已开启 CORS 跨域 —' },
+  corsHintLink: { en: 'see the guide', zh: '查看指南' },
   
   // Endpoint Config
   discovering: { en: 'Discovering available API endpoints and models...', zh: '正在自动发现可用的 API 端点与模型...' },
@@ -58,6 +63,11 @@ export const translations = {
   tasks: { en: 'tasks', zh: '任务' },
   endpoint: { en: 'Endpoint', zh: '端点' },
   round: { en: 'Round', zh: '轮次' },
+  benchmarkFailed: { en: 'Benchmark Failed', zh: '测试失败' },
+  benchmarkFailedDesc: { en: 'The benchmark could not complete. This is often a CORS or connectivity issue.', zh: '测试未能完成。这通常是 CORS 跨域或连接问题导致的。' },
+  retry: { en: 'Retry', zh: '重试' },
+  dismiss: { en: 'Dismiss', zh: '关闭' },
+  viewCorsGuide: { en: 'View CORS Guide', zh: '查看跨域指南' },
   
   // Dashboard
   results: { en: 'Results', zh: '测试结果' },

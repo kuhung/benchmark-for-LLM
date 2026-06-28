@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react'
 import { BenchmarkSession } from '@/lib/benchmark/types'
 import { getAllSessions, deleteSession, exportSession, importSession } from '@/lib/store'
+import { exportCSV } from '@/lib/export-csv'
+import { generateMarkdownReport } from '@/lib/report'
 import { PROMPT_PRESETS } from '@/lib/prompts'
 import { Button } from '@/components/ui/button'
-import { Trash2, Download, Upload, Eye, GitCompare } from 'lucide-react'
+import { Trash2, Download, Upload, Eye, GitCompare, FileSpreadsheet, FileText } from 'lucide-react'
 import { useI18n } from '@/lib/i18n'
 
 function getPromptLabel(session: BenchmarkSession, lang: 'en' | 'zh'): string {
@@ -80,15 +82,27 @@ export function HistoryList({ onView, onCompare, refreshTrigger }: HistoryListPr
     await loadSessions()
   }
 
-  const handleExport = async (session: BenchmarkSession) => {
-    const json = await exportSession(session)
-    const blob = new Blob([json], { type: 'application/json' })
+  const downloadBlob = (content: string, mime: string, session: BenchmarkSession, ext: string) => {
+    const blob = new Blob([content], { type: mime })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `benchmark-${new Date(session.timestamp).toISOString().slice(0, 10)}.json`
+    a.download = `benchmark-${new Date(session.timestamp).toISOString().slice(0, 10)}.${ext}`
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  const handleExport = async (session: BenchmarkSession) => {
+    const json = await exportSession(session)
+    downloadBlob(json, 'application/json', session, 'json')
+  }
+
+  const handleExportCSV = (session: BenchmarkSession) => {
+    downloadBlob(exportCSV(session), 'text/csv;charset=utf-8', session, 'csv')
+  }
+
+  const handleExportMarkdown = (session: BenchmarkSession) => {
+    downloadBlob(generateMarkdownReport(session), 'text/markdown;charset=utf-8', session, 'md')
   }
 
   const handleImport = async () => {
@@ -203,8 +217,14 @@ export function HistoryList({ onView, onCompare, refreshTrigger }: HistoryListPr
                       <Button variant="outline" size="sm" onClick={() => onView(session)}>
                         <Eye className="h-3.5 w-3.5 mr-1" /> {t('view')}
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExport(session)} title={t('export')}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExport(session)} title={`${t('export')} JSON`}>
                         <Download className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExportCSV(session)} title={`${t('export')} CSV`}>
+                        <FileSpreadsheet className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleExportMarkdown(session)} title={`${t('export')} ${t('report')}`}>
+                        <FileText className="h-3.5 w-3.5" />
                       </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive" onClick={() => handleDelete(session.id)} title={t('delete')}>
                         <Trash2 className="h-3.5 w-3.5" />

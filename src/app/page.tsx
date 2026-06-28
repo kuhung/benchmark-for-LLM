@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Endpoint, BenchmarkConfig, BenchmarkProgress, BenchmarkSession } from '@/lib/benchmark/types'
 import { BenchmarkOrchestrator } from '@/lib/benchmark/orchestrator'
 import { fetchModels } from '@/lib/benchmark/runner'
@@ -16,7 +16,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { LangToggle } from '@/components/lang-toggle'
 import { Button } from '@/components/ui/button'
 import { DocsGuide } from '@/components/docs-guide'
-import { Play, RotateCcw, Clock, Gauge, Loader2, BookOpen, Github } from 'lucide-react'
+import { Play, RotateCcw, Clock, Gauge, Loader2, BookOpen, Github, ArrowLeft } from 'lucide-react'
 import { useI18n } from '@/lib/i18n'
 
 export default function Home() {
@@ -35,9 +35,17 @@ export default function Home() {
 
   const [progress, setProgress] = useState<BenchmarkProgress>({ status: 'idle', completedTasks: 0, totalTasks: 0 })
   const [session, setSession] = useState<BenchmarkSession | null>(null)
+  const [resultSource, setResultSource] = useState<'run' | 'history'>('run')
   const [orchestrator, setOrchestrator] = useState<BenchmarkOrchestrator | null>(null)
   const [historyRefresh, setHistoryRefresh] = useState(0)
   const [compareSessions, setCompareSessions] = useState<BenchmarkSession[] | null>(null)
+  const compareRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (compareSessions) {
+      compareRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [compareSessions])
 
   useEffect(() => {
     async function discover() {
@@ -89,17 +97,45 @@ export default function Home() {
       const actualPrompt = typeof config.prompt === 'string' ? config.prompt : config.prompt[lang]
       const actualConfig = { ...config, prompt: actualPrompt }
       const result = await orch.run(endpoints, actualConfig)
+      // Cancelled before any endpoint produced results -> just return to the form, no empty session.
+      if (result.results.length === 0) {
+        setProgress({ status: 'idle', completedTasks: 0, totalTasks: 0 })
+        return
+      }
+      setResultSource('run')
       setSession(result)
       await saveSession(result)
       setHistoryRefresh(n => n + 1)
     } catch (err) {
       console.error('Benchmark failed:', err)
-      setProgress(p => ({ ...p, status: 'error' }))
+      setProgress(p => ({
+        ...p,
+        status: 'error',
+        errorMessage: err instanceof Error ? err.message : String(err),
+      }))
     }
   }, [endpoints, config, lang])
 
   const cancelBenchmark = () => {
     orchestrator?.cancel()
+  }
+
+  const dismissError = () => {
+    setProgress({ status: 'idle', completedTasks: 0, totalTasks: 0 })
+  }
+
+  const openCorsGuide = () => {
+    setProgress({ status: 'idle', completedTasks: 0, totalTasks: 0 })
+    setSession(null)
+    setActiveTab('guide')
+    setTimeout(() => {
+      const el = document.getElementById('section-cors')
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        const button = el.querySelector('button')
+        if (button) button.click()
+      }
+    }, 50)
   }
 
   return (
@@ -138,7 +174,10 @@ export default function Home() {
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
-                onClick={() => setActiveTab('history')}
+                onClick={() => {
+                  setActiveTab('history')
+                  setSession(null)
+                }}
               >
                 <Clock className="h-3.5 w-3.5" />
                 {t('history')}
@@ -149,7 +188,10 @@ export default function Home() {
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
-                onClick={() => setActiveTab('guide')}
+                onClick={() => {
+                  setActiveTab('guide')
+                  setSession(null)
+                }}
               >
                 <BookOpen className="h-3.5 w-3.5" />
                 {t('guide')}
@@ -177,13 +219,61 @@ export default function Home() {
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-6 space-y-6">
-        {activeTab === 'new' && (
+        {/* Result view: independent of the active tab so it never mislabels the nav */}
+        {session ? (
+          <div className="space-y-6 animate-fade-in">
+            <button
+              onClick={() => {
+                if (resultSource === 'history') {
+                  setSession(null)
+                  setActiveTab('history')
+                } else {
+                  setSession(null)
+                  setActiveTab('new')
+                }
+              }}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              {resultSource === 'history' ? t('backToHistory') : t('newTest')}
+            </button>
+            <ResultDashboard session={session} />
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full"
+              onClick={() => {
+                if (resultSource === 'history') {
+                  setSession(null)
+                  setActiveTab('history')
+                } else {
+                  setSession(null)
+                  setActiveTab('new')
+                }
+              }}
+            >
+              {resultSource === 'history' ? (
+                <><ArrowLeft className="h-4 w-4 mr-2" /> {t('backToHistory')}</>
+              ) : (
+                <><RotateCcw className="h-4 w-4 mr-2" /> {t('runAnother')}</>
+              )}
+            </Button>
+          </div>
+        ) : (
           <>
-            {!session && (
+            {activeTab === 'new' && (
               <div className="space-y-6 animate-fade-in">
-                <p className="text-sm text-muted-foreground max-w-3xl">
-                  {t('heroDescription')}
-                </p>
+                <div className="max-w-3xl space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    {t('heroDescription')}
+                  </p>
+                  <p className="text-xs text-muted-foreground/80">
+                    {t('corsHint')}{' '}
+                    <button onClick={openCorsGuide} className="text-primary hover:underline">
+                      {t('corsHintLink')}
+                    </button>
+                  </p>
+                </div>
 
                 {/* Step 1: 端点配置 -- 用户首先需要知道测什么 */}
                 <section>
@@ -216,49 +306,40 @@ export default function Home() {
               </div>
             )}
 
-            {session && (
-              <div className="space-y-6 animate-fade-in">
-                <ResultDashboard session={session} />
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full"
-                  onClick={() => setSession(null)}
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  {t('newTest')}
-                </Button>
+            {activeTab === 'history' && (
+              <div className="animate-fade-in space-y-6">
+                {compareSessions && (
+                  <div className="space-y-4 scroll-mt-4" ref={compareRef}>
+                    <CompareView sessions={compareSessions} />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCompareSessions(null)}
+                    >
+                      <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> {t('closeComparison')}
+                    </Button>
+                  </div>
+                )}
+                <HistoryList
+                  onView={(s) => { setResultSource('history'); setSession(s) }}
+                  onCompare={(sessions) => setCompareSessions(sessions)}
+                  refreshTrigger={historyRefresh}
+                />
               </div>
             )}
+
+            {activeTab === 'guide' && <DocsGuide />}
           </>
         )}
-
-        {activeTab === 'history' && (
-          <div className="animate-fade-in space-y-6">
-            {compareSessions && (
-              <div className="space-y-4">
-                <CompareView sessions={compareSessions} />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCompareSessions(null)}
-                >
-                  <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> {t('closeComparison')}
-                </Button>
-              </div>
-            )}
-            <HistoryList
-              onView={(s) => { setSession(s); setActiveTab('new') }}
-              onCompare={(sessions) => setCompareSessions(sessions)}
-              refreshTrigger={historyRefresh}
-            />
-          </div>
-        )}
-
-        {activeTab === 'guide' && <DocsGuide />}
       </div>
 
-      <RunProgress progress={progress} onCancel={cancelBenchmark} />
+      <RunProgress
+        progress={progress}
+        onCancel={cancelBenchmark}
+        onRetry={startBenchmark}
+        onDismiss={dismissError}
+        onViewCorsGuide={openCorsGuide}
+      />
     </main>
   )
 }

@@ -3,16 +3,58 @@
 import { BenchmarkProgress } from '@/lib/benchmark/types'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { Loader2, XCircle } from 'lucide-react'
+import { Loader2, XCircle, AlertTriangle, RotateCcw, BookOpen } from 'lucide-react'
 import { useI18n } from '@/lib/i18n'
 
 interface RunProgressProps {
   progress: BenchmarkProgress
   onCancel: () => void
+  onRetry?: () => void
+  onDismiss?: () => void
+  onViewCorsGuide?: () => void
 }
 
-export function RunProgress({ progress, onCancel }: RunProgressProps) {
+export function RunProgress({ progress, onCancel, onRetry, onDismiss, onViewCorsGuide }: RunProgressProps) {
   const { t } = useI18n()
+
+  if (progress.status === 'error') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
+        <div className="mx-4 w-full max-w-sm rounded-lg border border-destructive/30 bg-card p-6 shadow-xl space-y-5">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
+            <h3 className="text-sm font-semibold">{t('benchmarkFailed')}</h3>
+          </div>
+
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {t('benchmarkFailedDesc')}
+          </p>
+
+          {progress.errorMessage && (
+            <div className="rounded-md bg-destructive/10 border border-destructive/20 px-3 py-2.5 text-xs text-destructive font-mono break-words max-h-28 overflow-y-auto">
+              {progress.errorMessage}
+            </div>
+          )}
+
+          <button
+            onClick={onViewCorsGuide}
+            className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+          >
+            <BookOpen className="h-3.5 w-3.5" /> {t('viewCorsGuide')}
+          </button>
+
+          <div className="flex gap-2">
+            <Button variant="default" size="default" onClick={onRetry} className="flex-1">
+              <RotateCcw className="h-4 w-4 mr-1.5" /> {t('retry')}
+            </Button>
+            <Button variant="outline" size="default" onClick={onDismiss} className="flex-1">
+              {t('dismiss')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (progress.status !== 'running') return null
 
